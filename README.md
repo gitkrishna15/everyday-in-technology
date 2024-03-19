@@ -1,2 +1,2 @@
-# a-look-at-cloud
+# everyday-in-technology
 Sharing views on cloud
