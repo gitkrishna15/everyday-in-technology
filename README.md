@@ -1,2 +1,2 @@
 # everyday-in-technology
-Sharing views on cloud
+Sharing my point of view and logging my work
