@@ -1,0 +1,36 @@
+Module 3: The Engine Room of the Cloud: A Technical Deep Dive into Core Services
+
+Core Cloud Services explores the actual tools and technologies that professionals use to build, store, and connect applications in a cloud-first world
+
+Compute: The Powerhouse of the Cloud
+In the cloud, "Compute" refers to server resources used for running systems that can be dynamically provisioned and configured as needed.
+• Virtualisation Basics: At the heart of cloud compute is the Resource Abstraction and Control Layer. This layer uses software elements like hypervisors and virtual machines (VMs) to manage access to physical hardware, ensuring efficient and secure usage.
+• Amazon EC2: Launching and managing virtual servers through Amazon EC2 is a fundamental skill for cloud administrators. These virtual computers provide the baseline capability to run arbitrary software and operating systems.
+• Containers: Beyond traditional VMs, modern architecture heavily utilizes containers. Container services allow for more granular control and are essential for Microservices and Cloud Native design.
+
+
+Storage Management: Finding a Home for Your Data
+Cloud storage offers massively scalable capacity for everything from active application files to long-term archives.
+• Object Storage (Amazon S3): Designed for secure, scalable object storage, Amazon S3 is the go-to for web-based application data and backups.
+• Block Storage (Amazon EBS): For data that needs to be attached directly to a virtual machine (like a hard drive), Amazon EBS provides the necessary block-level storage.
+• Long-Term Archival (Amazon Glacier): For data that is rarely accessed but must be kept for compliance, Glacier offers a low-cost, long-term solution.
+• Lifecycle and Classes: Effective storage management involves using storage classes to balance cost and performance, and setting up lifecycle management to automatically move or delete data as it ages.
+
+
+Cloud Networking: The Digital Fabric
+Building secure networks in the cloud is a "technological game changer".
+• Virtual Private Cloud (VPC): A VPC is a software-defined network (SDN) that allows you to remotely configure an isolated section of the cloud. It is the foundation for implementing security groups and VPNs.
+• Load Balancing and DNS: To ensure high availability, developers use Elastic Load Balancers (ELB) to distribute traffic and Amazon Route 53 for Domain Name System (DNS) and traffic routing.
+
+
+Databases: Relational vs. NoSQL
+Choosing the right database depends on the specific needs of the application.
+• Relational (Amazon RDS): Managed services like RDS allow you to run traditional relational databases (like MySQL or MariaDB) with the cloud provider handling the heavy lifting of maintenance and scaling.
+• NoSQL (Amazon DynamoDB): For applications requiring massive, rapid scalability, DynamoDB provides a non-relational (NoSQL) solution that can handle unpredictable workloads.
+
+
+Analogy for Understanding: Think of Core Services as the construction materials for a skyscraper. 
+Compute is the machinery and workers (the power to build); Storage is the warehouse where you keep the blueprints and materials (the space to hold things); 
+Networking is the set of stairs, lifts, and pipes that connect the floors (the paths for movement); and Databases are the filing cabinets in the offices (the organised systems for information). 
+To be a good builder, you must understand how each material performs under pressure.
+
