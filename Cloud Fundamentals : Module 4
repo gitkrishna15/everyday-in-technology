@@ -1,0 +1,42 @@
+Module 4: Fortifying the Cloud: A Deep Dive into Security, Governance, and Compliance
+
+
+As the cloud computing industry has grown into a "behemoth", cloud security professionals have become some of the highest earners in the technology sector. 
+However, maintaining a secure environment requires more than just installing software; it necessitates a deep understanding of the architectural and legal frameworks that govern digital assets. 
+Module 4 focuses on the critical pillars of security and governance required for a professional-grade cloud deployment.
+
+
+The Shared Responsibility Model
+A common misconception is that the cloud provider handles all security. In reality, security is a collaborative effort. The Shared Responsibility Model dictates that the split of obligations depends on the service model used (IaaS, PaaS, or SaaS).
+• Provider Responsibility: Generally responsible for "Security of the Cloud," which includes the physical resource layer (hardware, facilities, and HVAC) and the software fabric that enables resource pooling.
+• Consumer Responsibility: Responsible for "Security in the Cloud." This includes managing the guest operating system, application-level security, and protecting the data itself.
+
+
+Identity and Access Management (IAM)
+IAM is the first line of defence in a cloud-first world. It involves implementing role-based access control (RBAC) and strict policies to ensure that only authorised users can interact with specific resources.
+• Authentication and Authorisation: Robust authentication measures verify "who" a user is, while authorisation policies define "what" they are allowed to do.
+• Privileged Access: While providers handle system-level privileged users, consumers are responsible for managing application user accounts and access logs.
+
+
+Governance, Legal, and Risk Management
+Cloud governance involves the oversight of system health and conformance to business requirements.
+• Enterprise Risk Management (ERM): This includes identifying and mitigating threats and vulnerabilities in the cloud ecosystem.
+• Legal Concepts: Professionals must navigate complex contracts and understand electronic discovery, which is the process of identifying and retrieving electronic information for legal cases.
+• Cloud Service Management: This includes business support mechanisms such as SLA (Service Level Agreement) management and accounting.
+
+
+Global Compliance and Auditing
+Adhering to global standards is non-negotiable for organisations handling sensitive information. Common standards include GDPR (privacy), HIPAA (healthcare), PCI (payment cards), and SOX (financial reporting).
+• The Cloud Auditor: An independent actor that conducts performance and security monitoring to verify conformance to these standards. They ensure that data retention policies meet the legal requirements of specific jurisdictions.
+
+
+Infrastructure Protection
+Technical safeguards must be applied across the entire stack, from the network to the application layer.
+• Multi-Level Security: Protection must be implemented at the Network level (e.g., firewalls), Host level (e.g., hypervisor security and VM isolation), and Application level.
+• Encryption and Key Management: Using standards such as KMS (Key Management Service) ensures that data is protected both at rest and in transit.
+
+
+Analogy for Understanding: Think of the Shared Responsibility Model like a high-security apartment building. 
+The Provider is the building manager who secures the front gates, maintains the CCTV in the lobby, and ensures the structural integrity of the building. 
+However, the Consumer is the tenant who is responsible for locking their individual front door (IAM), deciding who gets a spare key, and ensuring the contents inside are insured and legal (Compliance). 
+Even with the best lobby security, if a tenant leaves their balcony door open, the "shared" system fails.
