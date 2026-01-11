@@ -1,0 +1,44 @@
+Manufacturing / Industry 4.0 – Smart Factory Platform
+
+Industry: Manufacturing, Industrial IoT
+Examples: Automotive plant, electronics factory, process manufacturing
+
+Sensor data from machines is first processed at the factory edge to reduce latency and bandwidth.
+Data is securely streamed to the cloud ingestion layer, where it flows through high-throughput streaming services.
+Real-time processors update time-series databases and trigger events, while raw telemetry is stored for analytics.
+Machine-learning models trained on historical data predict failures and optimize operations.
+The platform is fully observable, secure, automated via CI/CD and IaC, and integrated with enterprise ERP systems.
+
+
+Key characteristics:
+  Thousands of machines & sensors
+  High-frequency telemetry (milliseconds)
+  Edge + cloud hybrid by necessity
+  Predictive maintenance (ML)
+  Real-time dashboards for operators
+  Strong segregation between OT & IT networks
+
+
+Core Problems This Architecture Solves
+  Collecting sensor data from PLCs & machines
+  Processing data close to machines (edge)
+  Streaming massive telemetry to cloud
+  Detecting anomalies & predicting failures
+  Long-term analytics & optimization
+  Secure integration with enterprise IT (ERP)
+
+
+Architecture Diagram – Smart Factory / Industry 4.0
+  Flow:
+  Machines → Edge → Secure Ingestion → Stream Processing → Storage → Analytics & ML → Operations
+
+
+Why This Industry Is Architecturally Unique?
+| Dimension      | SaaS     | FinTech      | Healthcare | **Manufacturing**          |
+| -------------- | -------- | ------------ | ---------- | -------------------------- |
+| Data source    | Users    | Transactions | Records    | **Machines & Sensors**     |
+| Latency needs  | Medium   | Very Low     | Medium     | **Near real-time**         |
+| Edge computing | Rare     | Rare         | Occasional | **Mandatory**              |
+| Data volume    | Medium   | High         | High       | **Extremely high**         |
+| ML focus       | UX       | Fraud        | Diagnosis  | **Predictive maintenance** |
+| Hybrid setup   | Optional | Common       | Mandatory  | **Always required**        |
