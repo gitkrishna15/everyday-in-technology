@@ -1,0 +1,52 @@
+Energy / Smart Grid Platform
+
+Industry: Energy, Utilities, Power Distribution
+
+Telemetry from smart meters, substations, and renewable plants is first processed through edge and SCADA systems for local control.
+Data is securely streamed into the cloud, where real-time processors update time-series and geospatial models of the grid.
+Analytics and machine learning forecast load, detect faults, and predict outages.
+Grid control services trigger alerts and corrective actions, while operations dashboards give operators real-time visibility.
+The system is designed for resilience, regulatory compliance, and hybrid operation across edge, on-prem, and cloud.
+
+Examples:
+  State electricity boards
+  National power grid operators
+  Renewable energy integration (solar, wind)
+  Smart meters & substations
+
+
+What Makes Smart Grid Architecture UNIQUE?
+  Dominant constraints:
+    Power flows are continuous & physical
+    Grid must survive partial failures
+    Edge + on-prem SCADA systems are mandatory
+    Decisions must be near-real-time
+    Data is geospatial + time-series
+    Regulatory audit is non-negotiable
+
+
+Core Problems This Architecture Solves
+  Collecting data from millions of smart meters
+  Monitoring substations & transformers
+  Detecting outages & load imbalance
+  Integrating renewable energy sources
+  Predicting demand & failures
+  Coordinating grid operations across regions
+
+
+Architecture Diagram – Smart Grid / Energy Platform
+  Flow:
+  Grid Devices → Edge / SCADA → Secure Ingestion → Streaming & Control → Analytics & ML → Grid Operations
+
+
+Why This Diagram Is Fundamentally Different?
+| Dimension             | SaaS     | FinTech              | Healthcare | Manufacturing | **Energy / Smart Grid**  |
+| --------------------- | -------- | -------------------- | ---------- | ------------- | ------------------------ |
+| Data source           | Users    | Payments             | Records    | Machines      | **Power infrastructure** |
+| Edge dependency       | Low      | Low                  | Medium     | High          | **Critical**             |
+| Time-series dominance | Low      | Medium               | Medium     | High          | **Extreme**              |
+| Geospatial data       | Rare     | Rare                 | Rare       | Medium        | **Core requirement**     |
+| Failure tolerance     | Retry    | Transaction rollback | Audit      | Buffer        | **Self-healing grid**    |
+| Control feedback      | Optional | Limited              | Advisory   | Advisory      | **Active grid control**  |
+
+
