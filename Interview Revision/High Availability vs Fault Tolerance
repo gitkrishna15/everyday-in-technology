@@ -1,0 +1,177 @@
+Topic: High Availability vs Fault Tolerance
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What it is
+High Availability (HA) means a system is designed to minimize downtime and recover quickly when failures occur.
+Fault Tolerance (FT) means a system is designed to continue operating without interruption, even when components fail.
+In simple terms:
+	•	High Availability = Recover quickly
+	•	Fault Tolerance = Never go down
+Why it exists
+Failures are inevitable:
+	•	Servers crash
+	•	Networks fail
+	•	Disks corrupt
+	•	Regions go down
+	•	Humans make mistakes
+Systems must be designed to handle failures gracefully.
+What breaks if we don’t understand the difference
+If HA and FT are confused:
+	•	Architects over-engineer systems unnecessarily
+	•	Costs increase dramatically
+	•	Teams promise unrealistic uptime
+	•	Recovery strategies fail during real outages
+	•	Business expectations are misaligned
+Most systems only need High Availability, not Fault Tolerance.
+
+2. Tradeoffs
+Performance vs Cost
+Fault-tolerant systems require duplicated infrastructure running in parallel, which is expensive. High-availability systems are cheaper but allow brief downtime.
+Simplicity vs Control
+HA systems are simpler to implement. FT systems require complex coordination and synchronization.
+Consistency vs Availability
+Fault-tolerant systems often sacrifice strong consistency. Highly consistent systems usually cannot be fully fault-tolerant.
+Speed vs Reliability
+FT systems require additional processing to keep systems in sync. HA systems recover fast but may have short service interruptions.
+Operations vs Automation
+Fault tolerance requires automation and monitoring at a much higher level. HA systems are easier to operate and maintain.
+
+3. Design Calmly
+When to Use High Availability
+	•	Most enterprise applications
+	•	Web applications
+	•	APIs
+	•	Internal platforms
+	•	Systems where brief downtime is acceptable
+When to Use Fault Tolerance
+	•	Telecom signaling systems
+	•	Financial transaction processing
+	•	Stock trading platforms
+	•	Life-critical systems
+	•	Core network infrastructure
+When Not to Use Fault Tolerance
+	•	Cost-sensitive systems
+	•	Non-critical workloads
+	•	Systems with complex state
+	•	Applications without strict uptime SLAs
+Assumptions That Must Be True
+	•	Failure is expected
+	•	Monitoring is accurate
+	•	Failover mechanisms are tested
+	•	Teams understand recovery processes
+
+4. Think Like a System Owner
+Failure Modes and Why They Happen
+	•	Single instance failure causes outage Reason: No redundancy
+	•	Multi-instance setup but shared dependency fails Reason: Database or storage is single point of failure
+	•	Failover exists but is slow Reason: DNS or manual intervention
+	•	Fault-tolerant design but data inconsistency occurs Reason: Improper synchronization
+
+Cost Explosion Scenarios
+	•	Active-active infrastructure running continuously
+	•	Duplicate databases across regions
+	•	Cross-region data replication costs
+	•	Complex monitoring and alerting pipelines
+	•	Over-engineering for non-critical workloads
+
+Security and Risk Implications
+	•	Larger attack surface
+	•	More access points
+	•	Increased complexity in key management
+	•	Risk of inconsistent security policies across regions
+
+Operational Challenges
+	•	Debugging distributed failures
+	•	Handling partial outages
+	•	Maintaining consistency across replicas
+	•	Testing failure scenarios without impacting users
+	•	Coordinating incident response
+
+Scaling Limits
+	•	Fault tolerance scales poorly with stateful systems
+	•	Latency increases with synchronous replication
+	•	Network reliability becomes a bottleneck
+	•	Cost grows exponentially with redundancy
+
+5. Real World Applications
+Example 1: Web Application (High Availability)
+Problem: Downtime during server failure.
+Implementation:
+	•	Load balancer across multiple instances
+	•	Auto-scaling group
+	•	Health checks
+	•	Multi-AZ deployment
+Outcome:
+	•	Short interruption during failure
+	•	Automatic recovery
+	•	Acceptable for most businesses
+
+Example 2: Payment Processing System (Fault Tolerance)
+Problem: Transactions must not fail or duplicate.
+Implementation:
+	•	Active-active data centers
+	•	Synchronous replication
+	•	Distributed consensus
+	•	Zero data loss architecture
+Outcome:
+	•	No downtime during failure
+	•	Higher latency
+	•	High operational and infrastructure cost
+
+Example 3: Telecom Core Network
+Problem: Call drops are unacceptable.
+Implementation:
+	•	Redundant network elements
+	•	Real-time failover
+	•	Geographically separated nodes
+	•	Continuous synchronization
+Outcome:
+	•	Extremely high availability
+	•	Very high operational complexity
+	•	Significant cost investment
+
+6. Cloud Service Mapping
+AWS
+	•	High Availability:
+	◦	Multi-AZ deployments
+	◦	Load Balancers
+	◦	Auto Scaling Groups
+	•	Fault Tolerance:
+	◦	Multi-region active-active
+	◦	DynamoDB Global Tables
+	◦	Route 53 health checks
+Azure
+	•	Availability Sets and Zones
+	•	Azure Load Balancer
+	•	Geo-redundant storage
+GCP
+	•	Regional and multi-regional services
+	•	Global load balancing
+	•	Multi-zone deployments
+
+7. Interview Perspective
+How to Explain It in an Interview
+Say: “High availability minimizes downtime by recovering quickly. Fault tolerance prevents downtime entirely. Most systems need HA, very few truly need fault tolerance.”
+Then explain:
+	•	Business impact
+	•	Cost implications
+	•	Operational complexity
+	•	Recovery expectations
+What Interviewers Look For
+	•	Understanding of tradeoffs
+	•	Practical decision-making
+	•	Ability to justify cost vs reliability
+	•	Awareness of real-world failure scenarios
+Common Mistakes
+	•	Saying fault tolerance is always better
+	•	Ignoring cost implications
+	•	Not understanding data consistency impact
+	•	Confusing redundancy with fault tolerance
+
+Final Takeaway
+High Availability is about recovering fast. Fault Tolerance is about never failing.
+Great architects:
+	•	Use HA for most systems
+	•	Reserve FT for critical workloads
+	•	Balance cost, complexity, and reliability
+	•	Design for failure, not perfection
