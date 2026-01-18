@@ -1,216 +1,115 @@
+Topic: Load Balancer
 1. What is it? Why does it exist? What breaks if we don’t use it?
-
 A Load Balancer is a component that distributes incoming traffic across multiple backend servers to ensure availability, reliability, and performance.
-
 It exists because:
-
-A single server cannot handle unlimited traffic
-
-Servers fail unpredictably
-
-Traffic patterns fluctuate heavily
-
-Applications need zero-downtime deployments
-
+	•	A single server cannot handle unlimited traffic
+	•	Servers fail unpredictably
+	•	Traffic patterns fluctuate heavily
+	•	Applications need zero-downtime deployments
 Without a load balancer:
-
-One server becomes a single point of failure
-
-Traffic spikes crash applications
-
-Maintenance causes downtime
-
-Scaling becomes manual and risky
-
-User experience degrades during peak usage
-
+	•	One server becomes a single point of failure
+	•	Traffic spikes crash applications
+	•	Maintenance causes downtime
+	•	Scaling becomes manual and risky
+	•	User experience degrades during peak usage
 In real systems, load balancers are mandatory once traffic becomes unpredictable or business-critical.
 
 2. Tradeoffs
 Performance vs Cost
-
-Layer 4 load balancers offer high throughput and low latency but limited routing intelligence.
-Layer 7 load balancers provide rich routing and security features but add latency and cost.
-
+Layer 4 load balancers offer high throughput and low latency but limited routing intelligence. Layer 7 load balancers provide rich routing and security features but add latency and cost.
 Simplicity vs Control
-
-Simple round-robin routing is easy to manage but inflexible.
-Advanced routing enables path-based or header-based logic but increases operational complexity.
-
+Simple round-robin routing is easy to manage but inflexible. Advanced routing enables path-based or header-based logic but increases operational complexity.
 Consistency vs Availability
-
-Sticky sessions improve user consistency but reduce fault tolerance.
-Stateless designs improve availability but require external session storage.
-
+Sticky sessions improve user consistency but reduce fault tolerance. Stateless designs improve availability but require external session storage.
 Speed vs Reliability
-
-Aggressive health checks improve reliability but increase network overhead.
-Loose health checks reduce overhead but increase failure impact.
-
+Aggressive health checks improve reliability but increase network overhead. Loose health checks reduce overhead but increase failure impact.
 Operations vs Automation
-
-Managed load balancers reduce operational effort but limit customization.
-Self-managed load balancers offer flexibility but require ongoing maintenance.
+Managed load balancers reduce operational effort but limit customization. Self-managed load balancers offer flexibility but require ongoing maintenance.
 
 3. Design Calmly
 When to Use
-
-Any internet-facing application
-
-Microservices architectures
-
-High availability systems
-
-Applications with unpredictable traffic
-
-Blue-green or canary deployments
-
+	•	Any internet-facing application
+	•	Microservices architectures
+	•	High availability systems
+	•	Applications with unpredictable traffic
+	•	Blue-green or canary deployments
 When to Avoid
-
-Very small internal tools
-
-Single-user systems
-
-Batch workloads without real-time traffic
-
+	•	Very small internal tools
+	•	Single-user systems
+	•	Batch workloads without real-time traffic
 Assumptions That Must Hold
-
-Backend services are stateless or session-managed
-
-Health checks are accurate
-
-Scaling policies are defined
-
-Backend failures are expected and handled
+	•	Backend services are stateless or session-managed
+	•	Health checks are accurate
+	•	Scaling policies are defined
+	•	Backend failures are expected and handled
 
 4. Think Like a System Owner
 Failure Modes
-
-Load balancer becomes a single point of failure
-
-Incorrect health checks route traffic to bad instances
-
-SSL misconfiguration causes outages
-
-DNS misconfiguration prevents traffic routing
-
+	•	Load balancer becomes a single point of failure
+	•	Incorrect health checks route traffic to bad instances
+	•	SSL misconfiguration causes outages
+	•	DNS misconfiguration prevents traffic routing
 Cost Explosion Risks
-
-High request volume pricing
-
-Cross-zone traffic costs
-
-Excessive SSL handshakes
-
-Idle load balancers running continuously
-
+	•	High request volume pricing
+	•	Cross-zone traffic costs
+	•	Excessive SSL handshakes
+	•	Idle load balancers running continuously
 Security Blast Radius
-
-Exposed public endpoints
-
-Weak TLS configuration
-
-Improper access control rules
-
-Missing rate limiting or WAF integration
-
+	•	Exposed public endpoints
+	•	Weak TLS configuration
+	•	Improper access control rules
+	•	Missing rate limiting or WAF integration
 Operational Burden
-
-Certificate rotation
-
-Health check tuning
-
-Traffic routing changes
-
-Debugging uneven traffic distribution
-
+	•	Certificate rotation
+	•	Health check tuning
+	•	Traffic routing changes
+	•	Debugging uneven traffic distribution
 Scaling Limits
-
-Connection limits per load balancer
-
-Backend capacity limits
-
-Regional scaling constraints
+	•	Connection limits per load balancer
+	•	Backend capacity limits
+	•	Regional scaling constraints
 
 5. Real-World Applications
 Web Applications
-
-Distributes traffic between application servers
-
-Enables zero-downtime deployments
-
-Protects backend systems from overload
-
+	•	Distributes traffic between application servers
+	•	Enables zero-downtime deployments
+	•	Protects backend systems from overload
 Telecom Systems
-
-Routes API traffic for subscriber management
-
-Handles high-volume signaling traffic
-
-Supports geo-based routing
-
+	•	Routes API traffic for subscriber management
+	•	Handles high-volume signaling traffic
+	•	Supports geo-based routing
 Microservices
-
-Acts as entry point for services
-
-Enables canary releases
-
-Supports API versioning
-
+	•	Acts as entry point for services
+	•	Enables canary releases
+	•	Supports API versioning
 Enterprise Systems
-
-Fronts ERP and CRM platforms
-
-Provides SSL termination
-
-Enables secure public access
+	•	Fronts ERP and CRM platforms
+	•	Provides SSL termination
+	•	Enables secure public access
 
 6. Cloud Service Mapping
 AWS
-
-Application Load Balancer (Layer 7)
-
-Network Load Balancer (Layer 4)
-
-Gateway Load Balancer
-
-Elastic Load Balancer (classic)
-
+	•	Application Load Balancer (Layer 7)
+	•	Network Load Balancer (Layer 4)
+	•	Gateway Load Balancer
+	•	Elastic Load Balancer (classic)
 Azure
-
-Azure Load Balancer
-
-Application Gateway
-
-Front Door
-
+	•	Azure Load Balancer
+	•	Application Gateway
+	•	Front Door
 GCP
-
-HTTP(S) Load Balancer
-
-TCP/UDP Load Balancer
-
-Internal Load Balancer
-
+	•	HTTP(S) Load Balancer
+	•	TCP/UDP Load Balancer
+	•	Internal Load Balancer
 OCI
-
-OCI Load Balancer
-
-Network Load Balancer
+	•	OCI Load Balancer
+	•	Network Load Balancer
 
 Key Interview Takeaway
-
-A load balancer is not just a traffic distributor.
-It is a core reliability, scalability, and security component.
-
+A load balancer is not just a traffic distributor. It is a core reliability, scalability, and security component.
 Strong architects think about:
-
-Failure isolation
-
-Cost impact at scale
-
-Traffic behavior
-
-Security exposure
-
-Operational simplicity
+	•	Failure isolation
+	•	Cost impact at scale
+	•	Traffic behavior
+	•	Security exposure
+	•	Operational simplicity
