@@ -1,0 +1,232 @@
+Topic: Idempotency
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What it is (explained simply)
+Idempotency means:
+If the same request is sent multiple times, the system behaves as if it was processed only once.
+It does not mean the request is processed only once. It means the final outcome remains the same, even if the request is repeated.
+Simple real-life analogy
+Imagine you press the elevator button multiple times.
+	•	If the elevator comes only once → idempotent
+	•	If pressing again calls another elevator → not idempotent
+In software:
+	•	“Create Order” called once → order created
+	•	“Create Order” called twice → still only one order exists
+
+Why idempotency exists
+In distributed systems:
+	•	Networks fail
+	•	Clients retry
+	•	Load balancers retry
+	•	Timeouts happen
+	•	Responses get lost even when processing succeeds
+This means the same request often reaches the server multiple times.
+The system must assume:
+“This request may already have been processed.”
+If it doesn’t, bad things happen.
+
+What breaks if we don’t understand idempotency
+Without idempotency:
+	•	A customer is charged twice
+	•	Orders are duplicated
+	•	Inventory becomes incorrect
+	•	Messages are processed multiple times
+	•	Financial reconciliation breaks
+	•	Support tickets increase
+	•	Trust in the system is lost
+Most critical production incidents involving payments or orders trace back to missing idempotency.
+
+2. Tradeoffs
+Performance vs Cost
+To ensure idempotency, systems must:
+	•	Store request identifiers
+	•	Perform duplicate checks
+	•	Maintain state for some time
+This adds:
+	•	Extra database reads
+	•	Storage overhead
+	•	Slight latency
+But without it, the cost of failures is far higher.
+
+Simplicity vs Control
+Non-idempotent APIs are simpler to write. Idempotent APIs require:
+	•	Request tracking
+	•	Conditional logic
+	•	Persistence
+But they are safer and production-ready.
+
+Consistency vs Availability
+Strong idempotency often needs:
+	•	Consistent writes
+	•	Transactional checks
+This may slightly reduce availability, but ensures correctness.
+
+Speed vs Reliability
+Skipping idempotency is faster. Implementing it makes systems reliable under failure.
+In distributed systems, reliability always beats speed.
+
+3. Design Calmly
+When idempotency is absolutely required
+	•	Payments
+	•	Order creation
+	•	User creation
+	•	Subscription activation
+	•	Resource provisioning
+	•	Event processing
+	•	Message consumers
+If money, inventory, or user data is involved → idempotency is mandatory.
+
+When it may not be required
+	•	Read-only APIs
+	•	Metrics collection
+	•	Logging
+	•	Cache reads
+	•	Analytics ingestion (if duplicates acceptable)
+
+Assumptions that must be true
+To implement idempotency:
+	•	Each request has a unique identifier
+	•	Backend can store or verify that identifier
+	•	Duplicate detection logic exists
+	•	Requests may be replayed
+If any of these are missing, idempotency cannot work reliably.
+
+4. Think Like a System Owner
+Failure Scenario 1: Network Timeout
+What happens:
+	•	Client sends payment request
+	•	Server processes it successfully
+	•	Response is lost due to timeout
+	•	Client retries
+Without idempotency:
+	•	Payment is charged twice
+With idempotency:
+	•	Server recognizes same request
+	•	Returns previous response
+	•	No duplicate charge
+
+Failure Scenario 2: Load Balancer Retry
+What happens:
+	•	Backend takes too long
+	•	Load balancer retries request
+	•	Two backend nodes receive same request
+Without idempotency:
+	•	Two orders created
+With idempotency:
+	•	Second request is ignored
+
+Failure Scenario 3: Message Queue Redelivery
+What happens:
+	•	Consumer processes message
+	•	Crashes before ACK
+	•	Queue re-delivers message
+Without idempotency:
+	•	Event processed twice
+With idempotency:
+	•	Message ID already seen
+	•	Duplicate skipped
+
+Cost Explosion Risks
+	•	Duplicate DB writes
+	•	Multiple cloud resources created
+	•	Excessive retries
+	•	Manual cleanup work
+	•	Customer refunds
+Idempotency directly reduces operational cost.
+
+Security and Risk Impact
+	•	Double charges damage trust
+	•	Duplicate provisioning leaks resources
+	•	Inconsistent state affects audits
+	•	Hard to prove correctness in investigations
+
+Operational Challenges
+	•	Designing idempotency keys
+	•	Choosing storage for keys
+	•	Cleaning up old keys
+	•	Handling race conditions
+	•	Debugging partial failures
+
+Scaling Limits
+	•	Idempotency tables grow large
+	•	Hot keys cause contention
+	•	Cross-region idempotency is complex
+	•	Needs TTL and cleanup strategies
+
+5. Real World Applications
+Example 1: Payment System
+Scenario: User clicks “Pay” twice due to slow response.
+Implementation:
+	•	Client sends idempotency key
+	•	Backend stores key with transaction
+	•	Second request returns same transaction result
+Outcome:
+	•	No double charge
+	•	Safe retry behavior
+	•	Reliable payments
+
+Example 2: Order Creation API
+Scenario: Mobile app retries order creation due to network drop.
+Implementation:
+	•	Order ID generated client-side
+	•	Backend checks if order already exists
+	•	If yes, returns existing order
+Outcome:
+	•	No duplicate orders
+	•	Consistent order state
+
+Example 3: Event Processing Pipeline
+Scenario: Kafka replays message after consumer crash.
+Implementation:
+	•	Consumer stores processed event IDs
+	•	Ignores duplicates
+	•	Uses idempotent writes
+Outcome:
+	•	Exactly-once behavior
+	•	Reliable processing
+	•	No data corruption
+
+6. Cloud Service Mapping
+AWS
+	•	API Gateway Idempotency Keys
+	•	DynamoDB conditional writes
+	•	SQS FIFO deduplication
+	•	Lambda retry handling
+Azure
+	•	Service Bus duplicate detection
+	•	Cosmos DB transactional writes
+	•	Durable Functions
+GCP
+	•	Pub/Sub deduplication
+	•	Firestore transactions
+	•	Cloud Tasks retry controls
+
+7. Interview Perspective
+How to Explain It
+Say: “Idempotency ensures that retrying the same request does not change the system state more than once. It is essential because retries are unavoidable in distributed systems.”
+Then explain:
+	•	Why retries happen
+	•	How idempotency prevents duplication
+	•	How it’s implemented
+
+What Interviewers Look For
+	•	Understanding of distributed failures
+	•	Awareness of retry behavior
+	•	Ability to design safe APIs
+	•	Real-world thinking, not theory
+
+Common Mistakes
+	•	Assuming APIs are called once
+	•	Not using idempotency keys
+	•	Relying only on client-side logic
+	•	Ignoring message redelivery
+	•	Treating idempotency as optional
+
+Final Takeaway
+Idempotency is not an optimization. It is a safety guarantee.
+If your system:
+	•	Handles money
+	•	Creates resources
+	•	Processes events
+	•	Talks over networks
+Then idempotency is non-negotiable.
