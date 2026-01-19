@@ -1,0 +1,237 @@
+Topic: Distributed Systems
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What a Distributed System Is
+A distributed system is a collection of independent computers (nodes) that work together to appear as a single system to users.
+Each node:
+	•	Has its own memory
+	•	Has its own CPU
+	•	Can fail independently
+	•	Communicates over a network
+From the user’s point of view:
+“It should behave like one reliable system.”
+
+Why Distributed Systems Exist
+They exist because:
+	•	Single machines don’t scale indefinitely
+	•	Hardware fails
+	•	Users are globally distributed
+	•	Systems must be highly available
+	•	Workloads fluctuate
+	•	Businesses need resilience
+You build distributed systems to achieve:
+	•	Scalability
+	•	Availability
+	•	Fault tolerance
+	•	Geographic reach
+
+What Breaks If You Don’t Understand Distributed Systems
+If you treat distributed systems like single machines:
+	•	Data becomes inconsistent
+	•	Requests randomly fail
+	•	Latency spikes appear
+	•	Systems behave unpredictably
+	•	Debugging becomes extremely hard
+	•	Outages cascade across services
+Most production outages happen not because of bugs, but because of incorrect assumptions about distributed behavior.
+
+2. Tradeoffs
+Consistency vs Availability
+You cannot guarantee both under failure (CAP theorem).
+Performance vs Reliability
+More replicas = more reliability More replicas = more coordination and latency
+Simplicity vs Scalability
+Single-node systems are simple Distributed systems are complex but scalable
+Speed vs Correctness
+Fast systems risk inconsistency Correct systems introduce latency
+Operations vs Automation
+Distributed systems require:
+	•	Monitoring
+	•	Automation
+	•	Alerting
+	•	Recovery procedures
+Without automation, they fail badly.
+
+3. Design Calmly
+When You Need a Distributed System
+	•	High traffic systems
+	•	Global applications
+	•	High availability requirements
+	•	Fault-tolerant platforms
+	•	Data processing at scale
+When You Should Avoid It
+	•	Small internal tools
+	•	Low traffic systems
+	•	Single-user applications
+	•	Early-stage prototypes
+Distributed systems increase complexity. Do not use them unless required.
+
+Assumptions That Must Be True
+	•	Networks are unreliable
+	•	Nodes will fail
+	•	Latency is unpredictable
+	•	Messages can be delayed or duplicated
+	•	Clocks are not synchronized
+	•	Failures are normal
+If your design assumes otherwise, it will fail.
+
+4. Think Like a System Owner
+Failure Scenario 1: Network Partition
+Two services cannot communicate.
+What happens:
+	•	Requests time out
+	•	Data diverges
+	•	Retries increase load
+	•	Cascading failures begin
+Decision:
+	•	Block requests (consistency)
+	•	Or serve stale data (availability)
+There is no perfect choice.
+
+Failure Scenario 2: Partial Failure
+One service is slow, not down.
+What happens:
+	•	Upstream services queue requests
+	•	Threads exhaust
+	•	Entire system slows down
+This causes:
+	•	Latency amplification
+	•	Cascading timeouts
+	•	System-wide outage
+
+Failure Scenario 3: Node Restart
+Node crashes and restarts.
+Issues:
+	•	In-flight requests lost
+	•	Partial writes
+	•	Inconsistent state
+	•	Cache cold start
+Design must assume this happens frequently.
+
+Cost Explosion Risks
+	•	Excessive replication
+	•	Cross-region traffic
+	•	Duplicate processing
+	•	Over-provisioned clusters
+	•	Complex observability tooling
+Distributed systems are expensive if not controlled.
+
+Security Risks
+	•	More attack surface
+	•	Inter-service authentication complexity
+	•	Secret distribution challenges
+	•	Misconfigured trust boundaries
+Zero-trust becomes mandatory.
+
+Scaling Limits
+	•	Coordination overhead
+	•	Leader election delays
+	•	Replication lag
+	•	Network saturation
+	•	Metadata bottlenecks
+Scaling compute is easy. Scaling coordination is hard.
+
+5. Real World Applications
+Example 1: E-commerce Platform
+Problem:
+	•	Millions of users
+	•	Flash sales
+	•	High read/write load
+Design:
+	•	Distributed web tier
+	•	Distributed cache
+	•	Partitioned database
+	•	Event-driven order processing
+Outcome:
+	•	High availability
+	•	Horizontal scalability
+	•	Complex consistency management
+
+Example 2: Payment System
+Problem:
+	•	Must never double-charge
+	•	Must tolerate failures
+Design:
+	•	Strong consistency for transactions
+	•	Idempotent APIs
+	•	Distributed locks
+	•	Synchronous replication
+Outcome:
+	•	Correctness over availability
+	•	Higher latency
+	•	Higher cost
+
+Example 3: Log Processing System
+Problem:
+	•	Massive data volume
+	•	No strict consistency needed
+Design:
+	•	Distributed message queues
+	•	Asynchronous consumers
+	•	Eventual consistency
+Outcome:
+	•	Extremely scalable
+	•	Cost efficient
+	•	Minor delays acceptable
+
+6. Core Concepts Every Architect Must Know
+	•	CAP Theorem
+	•	PACELC
+	•	Consistency models
+	•	Idempotency
+	•	Retry strategies
+	•	Circuit breakers
+	•	Bulkheads
+	•	Leader election
+	•	Consensus (Raft / Paxos)
+	•	Data partitioning
+	•	Replication strategies
+	•	Observability
+
+7. Cloud Service Mapping
+AWS
+	•	Distributed Compute: EC2, ECS, EKS
+	•	Storage: S3, DynamoDB
+	•	Messaging: SQS, SNS, Kafka
+	•	Coordination: DynamoDB, Zookeeper (via MSK)
+Azure
+	•	Service Fabric
+	•	Cosmos DB
+	•	Event Hubs
+	•	Service Bus
+GCP
+	•	Spanner
+	•	Pub/Sub
+	•	Bigtable
+	•	GKE
+
+8. Interview Perspective
+How to Explain Distributed Systems
+Say:
+“A distributed system is a set of independent machines working together. The challenge is not computation, but handling failures, latency, and consistency.”
+Then explain:
+	•	Why failures are inevitable
+	•	How your design handles them
+	•	What tradeoffs you chose
+
+What Interviewers Look For
+	•	Failure-oriented thinking
+	•	Tradeoff awareness
+	•	Practical system design knowledge
+	•	Experience with real outages
+	•	Understanding of CAP and consistency
+
+Common Mistakes
+	•	Assuming networks are reliable
+	•	Ignoring partial failures
+	•	Overusing synchronous calls
+	•	Not designing for retries
+	•	Treating distributed systems like monoliths
+
+Final Takeaway
+Distributed systems are not about scaling machines. They are about managing failure, uncertainty, and tradeoffs.
+Great architects:
+	•	Assume failure
+	•	Design for recovery
+	•	Choose tradeoffs consciously
+	•	Optimize for business impact, not theory
