@@ -1,0 +1,196 @@
+Topic: CAP vs ACID vs BASE
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What these concepts represent
+These three concepts answer different questions, but are often confused.
+	•	CAP → How distributed systems behave under network failure
+	•	ACID → Guarantees provided by traditional databases
+	•	BASE → A relaxed consistency model for distributed systems
+They exist because scalability, correctness, and availability pull systems in different directions.
+If you don’t understand the difference:
+	•	You design systems that don’t scale
+	•	You pick the wrong database
+	•	You mis-handle failures
+	•	You promise guarantees your system cannot provide
+
+2. CAP Theorem (Distributed System Perspective)
+What CAP Says
+In a distributed system, when a network partition occurs, you must choose between:
+	•	Consistency (C) – All nodes see the same data
+	•	Availability (A) – System responds to every request
+	•	Partition Tolerance (P) – System survives network failures
+You can only choose two.
+What CAP Really Means
+CAP only applies when a network partition happens.
+Since partitions are inevitable in distributed systems:
+	•	You must choose between Consistency or Availability
+
+CAP in Practice
+Choice
+Meaning
+CP
+Correct but may reject requests
+AP
+Always responds but may return stale data
+CA
+Only possible in non-distributed systems
+
+3. ACID (Database Consistency Model)
+What ACID Means
+ACID defines transaction guarantees in databases:
+	•	Atomicity – All or nothing
+	•	Consistency – Data always valid
+	•	Isolation – Transactions don’t interfere
+	•	Durability – Data survives failures
+ACID focuses on correctness of data, not distribution.
+
+Why ACID Exists
+ACID exists because:
+	•	Financial systems require correctness
+	•	Partial updates are unacceptable
+	•	Data corruption is catastrophic
+ACID is about trust.
+
+ACID in Practice
+ACID works well when:
+	•	System runs on a single node or tightly coupled cluster
+	•	Latency is acceptable
+	•	Scaling is vertical
+But ACID struggles when:
+	•	You scale across regions
+	•	You need high availability
+	•	You need low latency globally
+
+4. BASE (Distributed System Alternative)
+What BASE Means
+BASE is an alternative to ACID designed for distributed systems:
+	•	Basically Available – System always responds
+	•	Soft State – State may change over time
+	•	Eventually Consistent – Data will become consistent later
+BASE accepts inconsistency to achieve:
+	•	Scalability
+	•	Availability
+	•	Fault tolerance
+
+Why BASE Exists
+BASE exists because:
+	•	ACID does not scale globally
+	•	Network partitions are inevitable
+	•	High availability is often more important than correctness
+BASE is a practical compromise, not a flaw.
+
+5. How CAP, ACID, and BASE Relate
+Key Insight
+These are not competing theories. They apply at different layers.
+Concept  Scope
+ACID      Database transaction behavior
+BASE      Distributed data behavior
+CAP       System behavior under failure
+
+Relationship Summary
+	•	ACID focuses on correctness
+	•	BASE focuses on availability and scalability
+	•	CAP explains why you must choose
+
+6. Tradeoffs Explained Clearly
+Consistency vs Availability
+	•	ACID favors consistency
+	•	BASE favors availability
+Latency vs Correctness
+	•	ACID systems are slower
+	•	BASE systems are faster
+Simplicity vs Scale
+	•	ACID is easier to reason about
+	•	BASE scales better
+Cost vs Reliability
+	•	ACID costs more at scale
+	•	BASE reduces infrastructure cost
+
+7. Think Like a System Owner
+Failure Scenario 1: Payment System
+If using ACID:
+	•	Transaction blocks until confirmed
+	•	No double charges
+	•	Higher latency
+	•	Possible downtime
+Correct choice.
+
+Failure Scenario 2: Social Media Feed
+If using ACID:
+	•	Feed updates slow
+	•	System becomes expensive
+	•	Poor user experience
+Correct choice:
+	•	BASE
+	•	Eventual consistency
+	•	Async updates
+
+Failure Scenario 3: Inventory System
+Correct approach:
+	•	Stock deduction → ACID
+	•	Product views → BASE
+	•	Reviews → BASE
+Hybrid architecture is the real-world solution.
+
+8. Operational Perspective
+ACID Challenges
+	•	Hard to scale
+	•	Expensive
+	•	Tight coupling
+	•	Limited global distribution
+BASE Challenges
+	•	Debugging inconsistencies
+	•	Event reconciliation
+	•	Complex business logic
+	•	Conflict resolution
+
+9. Cloud Service Mapping
+AWS
+	•	ACID:
+	◦	RDS
+	◦	Aurora
+	•	BASE:
+	◦	DynamoDB
+	◦	S3
+Azure
+	•	ACID:
+	◦	Azure SQL
+	•	BASE:
+	◦	Cosmos DB
+GCP
+	•	ACID:
+	◦	Cloud Spanner
+	•	BASE:
+	◦	Bigtable
+	◦	Firestore
+
+10. Interview Perspective
+How to Explain It Simply
+Say:
+“ACID ensures correctness inside a database. BASE enables scalability in distributed systems. CAP explains why we must trade consistency for availability when failures occur.”
+Then explain:
+	•	Which one your system uses
+	•	Why that choice was made
+	•	What tradeoffs were accepted
+
+What Interviewers Look For
+	•	Clear understanding of tradeoffs
+	•	Ability to apply concepts practically
+	•	Awareness of distributed system behavior
+	•	Business-driven reasoning
+
+Common Mistakes
+	•	Thinking ACID and BASE are competitors
+	•	Applying ACID everywhere
+	•	Ignoring network partitions
+	•	Assuming strong consistency is always better
+
+Final Takeaway
+	•	ACID = correctness
+	•	BASE = scalability
+	•	CAP = reality of distributed systems
+Great architects:
+	•	Use ACID where correctness matters
+	•	Use BASE where scale matters
+	•	Use CAP to make informed tradeoffs
+	•	Design systems, not theories
