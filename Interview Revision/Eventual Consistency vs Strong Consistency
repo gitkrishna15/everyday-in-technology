@@ -1,0 +1,210 @@
+Topic: Eventual Consistency vs Strong Consistency
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What it is
+Strong Consistency means:
+When a write completes, all future reads return the latest value.
+Eventual Consistency means:
+After a write, the system will eventually become consistent, but some reads may temporarily return old data.
+In simple words:
+	•	Strong consistency = “Everyone sees the same data immediately”
+	•	Eventual consistency = “Everyone will see the same data, but not at the same time”
+
+Why this distinction exists
+This problem exists because:
+	•	Systems are distributed
+	•	Data is replicated
+	•	Networks are unreliable
+	•	Latency is unavoidable
+	•	Failures are common
+You cannot simultaneously guarantee:
+	•	Perfect consistency
+	•	High availability
+	•	Network fault tolerance
+This is the foundation of the CAP theorem.
+
+What breaks if we don’t understand this
+If teams misunderstand consistency:
+	•	Users see stale or incorrect data
+	•	Payments appear duplicated or missing
+	•	Inventory becomes inaccurate
+	•	Systems behave “randomly”
+	•	Debugging becomes extremely difficult
+Many production bugs are actually consistency misunderstandings, not code bugs.
+
+2. Tradeoffs
+Performance vs Cost
+Strong consistency requires coordination across nodes, increasing latency and cost. Eventual consistency is cheaper and faster but temporarily inaccurate.
+Simplicity vs Control
+Strong consistency is easier to reason about. Eventual consistency requires developers to handle stale data.
+Consistency vs Availability
+Strong consistency sacrifices availability during failures. Eventual consistency sacrifices immediate accuracy.
+Speed vs Reliability
+Strong consistency is slower but predictable. Eventual consistency is fast but requires tolerance for inconsistency.
+Operations vs Automation
+Strong consistency requires careful tuning. Eventual consistency works well with automation and scale.
+
+3. Design Calmly
+When to Use Strong Consistency
+	•	Payments
+	•	Banking transactions
+	•	Inventory management
+	•	Authentication
+	•	Financial records
+	•	Seat booking systems
+When to Use Eventual Consistency
+	•	Social media feeds
+	•	Likes and views
+	•	Analytics
+	•	Caching
+	•	Recommendations
+	•	Logs and metrics
+When to Mix Both
+Most real systems use:
+	•	Strong consistency for critical data
+	•	Eventual consistency for non-critical data
+Assumptions That Must Be True
+	•	You understand data importance
+	•	Users can tolerate temporary inconsistency
+	•	Business logic handles stale reads
+	•	Conflicts are resolved correctly
+
+4. Think Like a System Owner
+Failure Scenario 1: Strong Consistency Under Failure
+What happens:
+	•	Network partition occurs
+	•	Leader node becomes unreachable
+	•	System blocks writes
+Outcome:
+	•	No incorrect data
+	•	But system becomes unavailable
+This is acceptable for:
+	•	Banking
+	•	Payments
+	•	Core systems
+
+Failure Scenario 2: Eventual Consistency Under Load
+What happens:
+	•	User updates profile
+	•	Another user sees old data for a few seconds
+	•	Data syncs later
+Outcome:
+	•	System stays available
+	•	Slight inconsistency tolerated
+This is acceptable for:
+	•	Social media
+	•	Notifications
+	•	Feeds
+
+Cost and Risk Implications
+Strong consistency:
+	•	Higher latency
+	•	Higher infrastructure cost
+	•	Complex failover
+	•	Lower availability
+Eventual consistency:
+	•	Lower cost
+	•	Better scalability
+	•	Complex business logic
+	•	Temporary inconsistencies
+
+Operational Challenges
+	•	Debugging stale reads
+	•	Handling write conflicts
+	•	Explaining behavior to business teams
+	•	Designing idempotent updates
+	•	Monitoring replication lag
+
+Scaling Limits
+	•	Strong consistency does not scale globally
+	•	Eventual consistency scales horizontally
+	•	Cross-region strong consistency is expensive
+	•	Latency grows with distance
+
+5. Real World Applications
+Example 1: Payment System (Strong Consistency)
+Scenario: User pays for an order.
+Requirement:
+	•	Balance must update immediately
+	•	No duplicate or missing transactions
+Design:
+	•	Single leader database
+	•	Synchronous replication
+	•	Transaction locks
+Outcome:
+	•	Correctness guaranteed
+	•	Slightly higher latency
+
+Example 2: Social Media Feed (Eventual Consistency)
+Scenario: User likes a post.
+Behavior:
+	•	Like count updates locally
+	•	Other users see update later
+Design:
+	•	Asynchronous updates
+	•	Caching
+	•	Event-based propagation
+Outcome:
+	•	Fast experience
+	•	High scalability
+	•	Minor inconsistency accepted
+
+Example 3: Inventory System (Hybrid)
+Scenario:
+	•	Stock count must be accurate
+	•	Product view count can lag
+Design:
+	•	Stock updates strongly consistent
+	•	View counters eventually consistent
+Outcome:
+	•	Business correctness maintained
+	•	System remains scalable
+
+6. Cloud Service Mapping
+AWS
+	•	Strong consistency:
+	◦	RDS
+	◦	Aurora (with quorum writes)
+	•	Eventual consistency:
+	◦	DynamoDB (default)
+	◦	S3 (older behavior, now mostly strong)
+	◦	ElastiCache
+Azure
+	•	Strong:
+	◦	Azure SQL
+	•	Eventual:
+	◦	Cosmos DB (configurable consistency)
+GCP
+	•	Strong:
+	◦	Cloud Spanner
+	•	Eventual:
+	◦	Bigtable
+	◦	Firestore (configurable)
+
+7. Interview Perspective
+How to Explain It in an Interview
+Say: “Strong consistency ensures all reads reflect the latest write, while eventual consistency allows temporary differences to improve availability and scalability.”
+Then explain:
+	•	Where each is used
+	•	Why one is chosen over the other
+	•	What tradeoffs exist
+
+What Interviewers Look For
+	•	Understanding of CAP theorem
+	•	Ability to map consistency to business needs
+	•	Awareness of failure scenarios
+	•	Practical design thinking
+
+Common Mistakes
+	•	Assuming strong consistency is always better
+	•	Using eventual consistency without understanding impact
+	•	Ignoring replication lag
+	•	Not communicating consistency guarantees to users
+
+Final Takeaway
+Strong consistency protects correctness. Eventual consistency enables scale.
+Great architects:
+	•	Use strong consistency where correctness matters
+	•	Use eventual consistency where performance matters
+	•	Clearly define expectations
+	•	Design for failure, not perfection
