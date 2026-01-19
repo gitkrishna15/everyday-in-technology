@@ -1,0 +1,229 @@
+Topic: SLA, SLO, and SLI
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What they are (simple explanation)
+SLI (Service Level Indicator) A measurement. It answers: “What is the actual performance of the system?”
+Examples:
+	•	Request success rate
+	•	Latency
+	•	Error rate
+	•	Availability percentage
+
+SLO (Service Level Objective) A target or goal for an SLI. It answers: “How good do we want it to be?”
+Example:
+	•	99.9% successful requests per month
+
+SLA (Service Level Agreement) A business contract with consequences. It answers: “What happens if we fail?”
+Example:
+	•	If uptime drops below 99.9%, customer gets credits.
+
+Simple analogy
+Think of a restaurant:
+	•	SLI → How long food actually takes to arrive
+	•	SLO → Food should arrive within 15 minutes
+	•	SLA → If food takes longer than 30 minutes, meal is free
+
+Why these exist
+They exist to:
+	•	Align engineering with business expectations
+	•	Prevent over-engineering
+	•	Provide measurable reliability goals
+	•	Define accountability
+	•	Balance cost vs reliability
+Without them:
+	•	Teams chase “100% uptime” (impossible)
+	•	Systems are overbuilt
+	•	Costs explode
+	•	No clear success metric exists
+	•	Business and engineering fight constantly
+
+What breaks if we don’t understand them
+If teams confuse these:
+	•	SLAs are promised without technical feasibility
+	•	Engineers panic over minor issues
+	•	Systems are over-engineered
+	•	Budgets get burned
+	•	Reliability goals are unclear
+Most outages are worsened by poor SLO design, not technical failure.
+
+2. Tradeoffs
+Reliability vs Cost
+Higher SLO → more redundancy → higher cost Lower SLO → cheaper but more failures
+
+Simplicity vs Control
+Few SLIs → easier to manage Too many SLIs → noise and confusion
+
+Consistency vs Availability
+Tighter SLAs often reduce availability Looser SLAs allow faster recovery
+
+Speed vs Reliability
+Fast systems fail more often Reliable systems add checks and redundancy
+
+Operations vs Automation
+Strict SLAs require heavy automation Loose SLAs allow manual intervention
+
+3. Design Calmly
+What SLIs Should Measure
+Good SLIs are:
+	•	User-visible
+	•	Measurable
+	•	Actionable
+Examples:
+	•	Request success rate
+	•	Latency percentile (P95, P99)
+	•	Availability
+	•	Error rate
+Bad SLIs:
+	•	CPU usage
+	•	Memory usage
+	•	Disk space
+(These are causes, not outcomes.)
+
+How to Define SLOs Properly
+SLOs should:
+	•	Reflect user experience
+	•	Be achievable
+	•	Allow room for failure
+	•	Be reviewed regularly
+Example:
+	•	99.9% uptime → allows ~43 minutes downtime/month
+	•	99.99% uptime → allows ~4.3 minutes downtime/month
+Each extra 9 dramatically increases cost.
+
+When to Define an SLA
+Only define an SLA when:
+	•	There is a business contract
+	•	Financial penalties are acceptable
+	•	You can measure performance accurately
+	•	You can actually meet it
+Never define an SLA without:
+	•	Monitoring
+	•	Alerting
+	•	Error budgets
+
+4. Think Like a System Owner
+Failure Scenario 1: No SLO Defined
+What happens:
+	•	Engineers aim for 100% uptime
+	•	Systems are over-engineered
+	•	Costs increase
+	•	Team burnout occurs
+Reality:
+	•	100% uptime is impossible
+
+Failure Scenario 2: SLA Too Aggressive
+Example:
+	•	SLA = 99.999%
+Impact:
+	•	Requires multi-region active-active
+	•	Extremely expensive
+	•	Minor bugs cause penalties
+	•	Team operates in constant crisis mode
+
+Failure Scenario 3: SLIs Don’t Reflect Reality
+Example:
+	•	SLI tracks server uptime
+	•	Users experience slow responses
+Result:
+	•	SLA technically met
+	•	Users unhappy
+	•	Business impact ignored
+
+Cost Explosion Scenarios
+	•	Over-provisioning to meet strict SLOs
+	•	Multi-region active-active deployments
+	•	Excessive monitoring tools
+	•	High operational overhead
+
+Security and Risk Implications
+	•	SLAs may require audit trails
+	•	Regulatory penalties for breaches
+	•	Public trust loss
+	•	Legal exposure
+
+Operational Challenges
+	•	Choosing correct SLI
+	•	Setting realistic SLOs
+	•	Handling alert fatigue
+	•	Balancing reliability vs velocity
+	•	Communicating failures to stakeholders
+
+5. Real World Applications
+Example 1: E-commerce Website
+SLI:
+	•	Successful checkout rate
+SLO:
+	•	99.9% success per month
+SLA:
+	•	Refund or credit if breached
+Outcome:
+	•	Engineering focuses on checkout reliability
+	•	Non-critical features get lower priority
+
+Example 2: Cloud API Provider
+SLI:
+	•	API latency (P95)
+SLO:
+	•	< 300ms for 99% requests
+SLA:
+	•	Credits if exceeded
+Outcome:
+	•	Focus on performance tuning
+	•	Clear accountability
+
+Example 3: Internal Enterprise System
+SLI:
+	•	Service availability
+SLO:
+	•	99.5%
+SLA:
+	•	None (internal only)
+Outcome:
+	•	Flexibility for maintenance
+	•	Lower cost
+	•	Realistic expectations
+
+6. Cloud Service Mapping
+AWS
+	•	CloudWatch metrics → SLI
+	•	CloudWatch Alarms → SLO tracking
+	•	AWS SLA → Service commitment
+Azure
+	•	Azure Monitor
+	•	Service Health
+	•	Azure SLAs
+GCP
+	•	Cloud Monitoring
+	•	Error budget policies
+	•	Google Cloud SLAs
+
+7. Interview Perspective
+How to Explain It in an Interview
+Say:
+“SLIs measure performance, SLOs define acceptable targets, and SLAs are business commitments. SLOs are the most important because they drive engineering decisions.”
+Then explain:
+	•	How you choose SLIs
+	•	How you set realistic SLOs
+	•	Why SLAs must be conservative
+
+What Interviewers Look For
+	•	Understanding of reliability engineering
+	•	Business-aware thinking
+	•	Experience with tradeoffs
+	•	Knowledge of error budgets
+
+Common Mistakes
+	•	Confusing SLA with SLO
+	•	Measuring infrastructure instead of user experience
+	•	Setting unrealistic SLAs
+	•	Ignoring error budgets
+
+Final Takeaway
+	•	SLI = What you measure
+	•	SLO = What you aim for
+	•	SLA = What you promise
+Great architects:
+	•	Design systems around SLOs
+	•	Use error budgets wisely
+	•	Balance reliability and velocity
+	•	Treat uptime as a business decision, not a technical one
