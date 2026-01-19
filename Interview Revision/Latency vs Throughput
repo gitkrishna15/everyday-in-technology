@@ -1,0 +1,197 @@
+Topic: Latency vs Throughput
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What it is
+Latency is the time taken for a single request to travel from the client to the system and back with a response.
+Throughput is the amount of work a system can process in a given time, usually measured as:
+	•	Requests per second (RPS)
+	•	Transactions per second (TPS)
+	•	Data processed per second
+In simple terms:
+	•	Latency = how fast one request is handled
+	•	Throughput = how many requests can be handled
+
+Why this distinction exists
+Systems often behave differently under load:
+	•	A system can be fast but handle few requests
+	•	A system can handle many requests but respond slowly
+Designing systems without understanding this difference leads to:
+	•	Poor user experience
+	•	Overprovisioned infrastructure
+	•	Incorrect scaling strategies
+	•	Misleading performance metrics
+
+What breaks if we don’t understand it
+If latency and throughput are confused:
+	•	Systems appear “healthy” but feel slow to users
+	•	Auto-scaling reacts incorrectly
+	•	Bottlenecks are misdiagnosed
+	•	Performance optimizations target the wrong layer
+	•	SLAs are missed despite high capacity
+This is one of the most common causes of performance-related outages.
+
+2. Tradeoffs
+Performance vs Cost
+Low latency often requires expensive infrastructure. High throughput systems can be cheaper but tolerate slower responses.
+Simplicity vs Control
+Low-latency systems require careful tuning and optimization. High-throughput systems can use batching and buffering.
+Consistency vs Availability
+Low latency favors local processing. High throughput often relies on asynchronous processing.
+Speed vs Reliability
+Optimizing for speed can reduce retries and safety checks. Optimizing for throughput may introduce queues and retries.
+Operations vs Automation
+Low latency systems need constant tuning. High throughput systems rely more on automation and scaling.
+
+3. Design Calmly
+When to Optimize for Latency
+	•	User-facing applications
+	•	Real-time systems
+	•	Trading platforms
+	•	Gaming
+	•	Voice and video systems
+	•	APIs used by mobile apps
+When to Optimize for Throughput
+	•	Data pipelines
+	•	Batch processing
+	•	Log ingestion
+	•	Analytics systems
+	•	Streaming platforms
+When to Balance Both
+	•	APIs serving large traffic
+	•	E-commerce platforms
+	•	Payment systems
+	•	Search engines
+Assumptions That Must Be True
+	•	Performance goals are clearly defined
+	•	Bottlenecks are measurable
+	•	Network latency is understood
+	•	Downstream systems can handle load
+
+4. Think Like a System Owner
+Failure Modes and Why They Happen
+	•	High throughput but poor user experience Cause: Latency ignored during scaling
+	•	Low latency but frequent crashes Cause: System overloaded beyond capacity
+	•	Latency spikes under load Cause: Resource contention or queue buildup
+	•	High throughput but data inconsistency Cause: Async processing without coordination
+
+Cost Explosion Scenarios
+	•	Over-provisioning to reduce latency
+	•	Excessive caching without eviction policies
+	•	High network egress from low-latency routing
+	•	Over-scaling compute to chase response time goals
+
+Security and Risk Implications
+	•	Latency optimization may bypass security checks
+	•	High throughput increases attack surface
+	•	DDoS attacks exploit throughput limits
+	•	Logging at scale increases data exposure
+
+Operational Challenges
+	•	Identifying true bottlenecks
+	•	Distinguishing latency vs saturation issues
+	•	Tuning autoscaling thresholds
+	•	Debugging performance regressions
+	•	Coordinating scaling across services
+
+Scaling Limits
+	•	Latency limited by physics (network speed)
+	•	Throughput limited by hardware and architecture
+	•	Databases often become the bottleneck
+	•	Synchronous systems scale worse than async ones
+
+5. Real World Applications
+Example 1: E-commerce Website
+Problem: Slow page loads during peak traffic.
+Analysis:
+	•	Latency matters more than throughput for user experience
+	•	Backend services responded slowly
+Solution:
+	•	CDN for static content
+	•	Caching for product data
+	•	Reduced API call depth
+Outcome:
+	•	Faster page loads
+	•	Better conversion rate
+	•	Stable performance under load
+
+Example 2: Log Processing System
+Problem: Millions of logs per minute.
+Analysis:
+	•	Latency not critical
+	•	Throughput is primary concern
+Solution:
+	•	Batch ingestion
+	•	Message queues
+	•	Asynchronous processing
+Outcome:
+	•	High ingestion rate
+	•	Low infrastructure cost
+	•	Acceptable processing delay
+
+Example 3: Payment Processing System
+Problem: Transactions must be fast and reliable.
+Analysis:
+	•	Latency affects user experience
+	•	Throughput affects scalability
+Solution:
+	•	Synchronous validation
+	•	Asynchronous settlement
+	•	Rate limiting
+Outcome:
+	•	Fast response to user
+	•	High system capacity
+	•	Reliable processing
+
+6. Cloud Service Mapping
+AWS
+	•	Low Latency:
+	◦	CloudFront
+	◦	Global Accelerator
+	◦	ALB
+	•	High Throughput:
+	◦	SQS
+	◦	Kinesis
+	◦	S3
+	◦	EC2 Auto Scaling
+Azure
+	•	Low Latency:
+	◦	Front Door
+	◦	Azure CDN
+	•	High Throughput:
+	◦	Event Hubs
+	◦	Blob Storage
+GCP
+	•	Low Latency:
+	◦	Cloud CDN
+	◦	Global Load Balancer
+	•	High Throughput:
+	◦	Pub/Sub
+	◦	BigQuery
+
+7. Interview Perspective
+How to Explain It in an Interview
+Say: “Latency measures how fast a single request is processed, while throughput measures how many requests the system can handle. Optimizing one often impacts the other, so architecture must balance both based on business needs.”
+Then explain:
+	•	Where latency matters
+	•	Where throughput matters
+	•	How tradeoffs are managed
+
+What Interviewers Look For
+	•	Understanding of performance tradeoffs
+	•	Ability to reason about system behavior
+	•	Awareness of real-world bottlenecks
+	•	Cost-conscious design thinking
+
+Common Mistakes
+	•	Treating latency and throughput as the same
+	•	Optimizing one without measuring the other
+	•	Ignoring downstream dependencies
+	•	Overengineering for low latency unnecessarily
+
+Final Takeaway
+Latency determines user experience. Throughput determines system capacity.
+Great architects:
+	•	Know which metric matters for each system
+	•	Design to balance both
+	•	Measure continuously
+	•	Optimize based on business impact, not theory
