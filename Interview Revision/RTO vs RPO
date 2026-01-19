@@ -1,0 +1,224 @@
+Topic: RTO vs RPO
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What they are
+RTO (Recovery Time Objective) The maximum acceptable time a system can be down after a failure.
+In simple words: “How long can the business survive without this system?”
+
+RPO (Recovery Point Objective) The maximum acceptable data loss measured in time.
+In simple words: “How much data can we afford to lose?”
+
+Simple analogy
+Imagine a laptop crash:
+	•	RTO = How long you can wait to use your laptop again
+	•	RPO = How much unsaved work you are okay losing
+If:
+	•	RTO = 1 hour → system must be back within 1 hour
+	•	RPO = 5 minutes → you can only lose last 5 minutes of data
+
+Why RTO and RPO exist
+They exist because:
+	•	Failures are inevitable
+	•	Zero downtime is extremely expensive
+	•	Perfect data safety is unrealistic
+	•	Businesses must balance cost vs risk
+Without RTO/RPO:
+	•	DR plans are meaningless
+	•	Systems are overbuilt or underbuilt
+	•	Recovery expectations are unclear
+	•	Business and IT disagree during incidents
+
+What breaks if we don’t understand them
+If RTO and RPO are unclear:
+	•	Recovery takes longer than expected
+	•	Data loss surprises business teams
+	•	Engineers panic during incidents
+	•	DR tests fail
+	•	Systems don’t meet compliance needs
+Most disaster recovery failures happen due to unclear RTO/RPO, not technical issues.
+
+2. Tradeoffs
+Recovery Speed vs Cost
+Lower RTO requires:
+	•	Hot standby
+	•	Active-active systems
+	•	Real-time replication
+All of which are expensive.
+
+Data Safety vs Performance
+Lower RPO requires:
+	•	Synchronous replication
+	•	Strong consistency
+	•	Higher write latency
+Higher RPO allows:
+	•	Async replication
+	•	Better performance
+	•	Lower cost
+
+Simplicity vs Reliability
+Simple backup-based recovery = cheap but slow Complex active-active systems = fast but hard to operate
+
+Operations vs Automation
+Low RTO requires automation Manual recovery increases RTO dramatically
+
+3. Design Calmly
+When to Target Low RTO (Minutes)
+	•	Payment systems
+	•	Telecom core services
+	•	Trading platforms
+	•	Customer-facing revenue systems
+When Higher RTO Is Acceptable
+	•	Internal tools
+	•	Analytics platforms
+	•	Reporting systems
+	•	Development environments
+
+When to Target Low RPO (Seconds or Zero)
+	•	Financial transactions
+	•	Order processing
+	•	User account data
+	•	Inventory systems
+When Higher RPO Is Acceptable
+	•	Logs
+	•	Metrics
+	•	Caches
+	•	Recommendation systems
+
+Assumptions That Must Be True
+	•	Backups are tested
+	•	Replication is working
+	•	Failover is automated
+	•	Teams know recovery procedures
+	•	Data integrity is verified
+If these are not true, your RTO/RPO numbers are meaningless.
+
+4. Think Like a System Owner
+Failure Scenario 1: Database Crash
+Question:
+	•	How long until service is restored?
+	•	How much data is lost?
+If:
+	•	RTO = 2 hours
+	•	RPO = 30 minutes
+Then:
+	•	System must be restored within 2 hours
+	•	Data written in last 30 minutes may be lost
+
+Failure Scenario 2: Region Outage
+Without multi-region setup:
+	•	RTO = hours or days
+	•	RPO = last backup time
+With active-passive:
+	•	RTO = minutes
+	•	RPO = few minutes
+With active-active:
+	•	RTO = near zero
+	•	RPO = near zero
+
+Cost Explosion Scenarios
+	•	Always-on replicas
+	•	Cross-region synchronous replication
+	•	Dedicated DR infrastructure
+	•	Continuous backups
+Lower RTO/RPO = exponentially higher cost
+
+Security and Compliance Impact
+	•	Regulations often mandate RPO limits
+	•	Financial audits require proof of recovery
+	•	Data loss may trigger compliance violations
+	•	Poor RTO impacts business reputation
+
+Operational Challenges
+	•	Regular DR drills
+	•	Backup validation
+	•	Failover testing
+	•	Runbook maintenance
+	•	Human error during recovery
+
+Scaling Limits
+	•	Large datasets increase recovery time
+	•	Synchronous replication limits write throughput
+	•	Global replication increases latency
+	•	Manual recovery doesn’t scale
+
+5. Real World Applications
+Example 1: Banking System
+Requirements:
+	•	RTO: < 5 minutes
+	•	RPO: 0 seconds
+Implementation:
+	•	Active-active databases
+	•	Synchronous replication
+	•	Automated failover
+Outcome:
+	•	Very high cost
+	•	Very high reliability
+
+Example 2: E-commerce Platform
+Requirements:
+	•	RTO: 15–30 minutes
+	•	RPO: 5–10 minutes
+Implementation:
+	•	Multi-AZ deployment
+	•	Async replication
+	•	Automated backup restore
+Outcome:
+	•	Good balance of cost and reliability
+
+Example 3: Analytics Platform
+Requirements:
+	•	RTO: 12 hours
+	•	RPO: 24 hours
+Implementation:
+	•	Daily backups
+	•	Manual restore
+Outcome:
+	•	Low cost
+	•	Acceptable data loss
+
+6. Cloud Service Mapping
+AWS
+	•	RTO/RPO tools:
+	◦	AWS Backup
+	◦	RDS Multi-AZ
+	◦	Aurora Global Database
+	◦	S3 Cross-Region Replication
+	◦	Route 53 failover
+Azure
+	•	Azure Backup
+	•	Azure Site Recovery
+	•	Geo-redundant storage
+GCP
+	•	Backup and DR
+	•	Cloud SQL HA
+	•	Multi-region storage
+
+7. Interview Perspective
+How to Explain It in an Interview
+Say:
+“RTO defines how fast we need to recover, and RPO defines how much data we can afford to lose. Together, they drive the DR architecture and cost.”
+Then explain:
+	•	What values you’d choose
+	•	Why
+	•	What tradeoffs exist
+
+What Interviewers Look For
+	•	Business-aligned thinking
+	•	Awareness of DR strategies
+	•	Cost vs reliability tradeoffs
+	•	Real-world recovery experience
+
+Common Mistakes
+	•	Confusing RTO with RPO
+	•	Assuming zero RPO is always required
+	•	Ignoring cost implications
+	•	Not testing recovery plans
+	•	Treating backups as DR
+
+Final Takeaway
+RTO defines how fast you must recover. RPO defines how much data you can lose.
+Great architects:
+	•	Define RTO/RPO before designing systems
+	•	Match recovery strategy to business value
+	•	Test recovery regularly
+	•	Accept tradeoffs consciously
