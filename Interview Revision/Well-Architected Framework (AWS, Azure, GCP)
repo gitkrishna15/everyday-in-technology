@@ -40,20 +40,13 @@ Most production outages are architecture failures, not code failures.
 
 2. Core Pillars (Common Across AWS / Azure / GCP)
 All three cloud providers follow the same core ideas, even if names differ.
-Pillar
-Purpose
-Operational Excellence
-Run and improve systems
-Security
-Protect data & systems
-Reliability
-Recover from failure
-Performance Efficiency
-Use resources efficiently
-Cost Optimization
-Avoid waste
-Sustainability (new)
-Minimize environmental impact
+Pillar						Purpose
+Operational Excellence		Run and improve systems
+Security					Protect data & systems
+Reliability					Recover from failure
+Performance Efficiency		Use resources efficiently
+Cost Optimization			Avoid waste
+Sustainability (new)		Minimize environmental impact
 
 3. Operational Excellence
 What it means
