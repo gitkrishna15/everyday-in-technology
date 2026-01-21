@@ -1,0 +1,262 @@
+Topic: Replication Strategies
+
+1. What is Replication? Why does it exist? What breaks if we don’t understand it?
+What Replication Means
+Replication is the process of maintaining multiple copies of the same data across different nodes or locations.
+Purpose:
+	•	High availability
+	•	Fault tolerance
+	•	Read scalability
+	•	Disaster recovery
+	•	Geographic distribution
+In simple words:
+Replication ensures your data survives failures and can be accessed quickly.
+
+Why Replication Exists
+Without replication:
+	•	A single disk failure causes data loss
+	•	A node crash brings the system down
+	•	Read traffic overloads one machine
+	•	Disaster recovery is impossible
+Replication exists because:
+	•	Hardware fails
+	•	Networks fail
+	•	Data is valuable
+	•	Systems must stay available
+
+What Breaks If We Don’t Understand Replication
+If replication is misunderstood:
+	•	Data becomes inconsistent
+	•	Writes are lost
+	•	Reads return stale values
+	•	Failover corrupts state
+	•	Recovery becomes unreliable
+	•	Systems appear “randomly broken”
+Most production outages blamed on “database issues” are actually replication design issues.
+
+2. Tradeoffs
+Consistency vs Availability
+More replicas → higher availability More replicas → harder to keep consistent
+
+Performance vs Durability
+Synchronous replication → safer but slower Asynchronous replication → faster but riskier
+
+Cost vs Reliability
+More replicas → higher storage & network cost Fewer replicas → higher failure risk
+
+Simplicity vs Scalability
+Single replica → simple Multi-replica → complex but scalable
+
+3. Design Calmly
+When Replication Is Required
+Replication is necessary when:
+	•	Data must survive failures
+	•	System must be highly available
+	•	Read traffic is high
+	•	Disaster recovery is required
+	•	Global access is needed
+
+When Replication Is Not Needed
+Replication may be unnecessary when:
+	•	Data is transient
+	•	Loss is acceptable
+	•	System is small
+	•	Strong consistency is required with low scale
+
+Assumptions That Must Be True
+	•	Network can fail
+	•	Nodes can crash
+	•	Replicas can lag
+	•	Writes may be lost if not designed properly
+	•	Conflict resolution is necessary
+If these are ignored, replication causes bugs instead of reliability.
+
+4. Types of Replication Strategies
+
+1️⃣ Single-Leader (Primary–Replica)
+How It Works
+	•	One leader (primary) handles all writes
+	•	Followers replicate data from leader
+	•	Reads may come from leader or replicas
+
+Pros
+	•	Simple design
+	•	Strong consistency (if reads from leader)
+	•	Easy to reason about
+
+Cons
+	•	Leader is bottleneck
+	•	Failover required
+	•	Replication lag possible
+
+Used In
+	•	MySQL
+	•	PostgreSQL
+	•	Amazon RDS
+	•	MongoDB (primary-secondary)
+
+2️⃣ Multi-Leader (Active-Active)
+How It Works
+	•	Multiple nodes accept writes
+	•	Data replicated between leaders
+	•	Conflict resolution required
+
+Pros
+	•	High availability
+	•	Writes accepted in multiple locations
+	•	Better global latency
+
+Cons
+	•	Conflict resolution complexity
+	•	Risk of data divergence
+	•	Harder to reason about
+
+Used In
+	•	Multi-region systems
+	•	Collaborative applications
+	•	Some NoSQL databases
+
+3️⃣ Leaderless Replication
+How It Works
+	•	No leader
+	•	Any node can accept reads/writes
+	•	Quorum used for consistency
+
+Pros
+	•	High availability
+	•	No single point of failure
+	•	Fast writes
+
+Cons
+	•	Eventual consistency
+	•	Conflict resolution required
+	•	Complex reads
+
+Used In
+	•	DynamoDB
+	•	Cassandra
+	•	Riak
+
+4️⃣ Synchronous vs Asynchronous Replication
+
+Synchronous Replication
+Write completes only after replicas acknowledge.
+Pros:
+	•	Strong consistency
+	•	No data loss
+Cons:
+	•	High latency
+	•	Slower writes
+	•	Reduced availability
+Used in:
+	•	Financial systems
+	•	Banking
+	•	Critical metadata
+
+Asynchronous Replication
+Write completes before replicas update.
+Pros:
+	•	Fast
+	•	Scalable
+	•	High availability
+Cons:
+	•	Risk of data loss
+	•	Replication lag
+Used in:
+	•	Analytics
+	•	Logs
+	•	Social platforms
+
+5. Think Like a System Owner
+
+Failure Scenario 1: Leader Crash
+If replication is:
+	•	Synchronous → safe but slower
+	•	Asynchronous → possible data loss
+Key question:
+How much data loss is acceptable?
+
+Failure Scenario 2: Network Partition
+	•	Leader reachable only from some nodes
+	•	Replicas fall behind
+	•	Conflicts possible
+Decision:
+	•	Block writes (CP)
+	•	Allow divergence (AP)
+
+Failure Scenario 3: Replica Lag
+	•	Reads from replica show stale data
+	•	Users see inconsistent state
+Fix:
+	•	Read from leader
+	•	Read-after-write consistency
+	•	Versioning
+
+Cost & Risk Implications
+	•	More replicas → more storage
+	•	Cross-region replication → high network cost
+	•	Sync replication → performance hit
+	•	Async replication → risk of data loss
+
+6. Replication Patterns in Practice
+
+Example 1: Banking System
+	•	Single leader
+	•	Synchronous replication
+	•	Strong consistency
+	•	Low tolerance for data loss
+
+Example 2: Social Media Platform
+	•	Multi-region replication
+	•	Asynchronous updates
+	•	Eventual consistency
+	•	High availability
+
+Example 3: Logging Platform
+	•	Leaderless replication
+	•	Quorum writes
+	•	Eventual consistency
+	•	Extremely high throughput
+
+7. Cloud Service Mapping
+AWS
+	•	RDS: Primary–Replica
+	•	Aurora: Distributed quorum replication
+	•	DynamoDB: Leaderless
+	•	S3: Multi-region replication
+Azure
+	•	Azure SQL geo-replication
+	•	Cosmos DB multi-region writes
+GCP
+	•	Cloud Spanner (synchronous)
+	•	Bigtable (asynchronous)
+
+8. Interview Perspective
+How to Explain Replication
+Say:
+“Replication is about keeping multiple copies of data to ensure availability and durability. The main design decision is between strong consistency and high availability.”
+Then explain:
+	•	Leader vs leaderless
+	•	Sync vs async
+	•	Failure behavior
+
+What Interviewers Look For
+	•	Understanding of replication lag
+	•	Awareness of consistency tradeoffs
+	•	Knowledge of leader election
+	•	Real-world failure handling
+
+Common Mistakes
+	•	Assuming replication = backup
+	•	Ignoring replication lag
+	•	Using synchronous replication everywhere
+	•	Not planning failover
+	•	Overlooking conflict resolution
+
+Final Takeaway
+Replication is not about copying data. It is about balancing consistency, availability, and performance.
+Great architects:
+	•	Choose replication strategy deliberately
+	•	Understand failure modes
+	•	Accept tradeoffs consciously
+	•	Design for recovery, not perfection
