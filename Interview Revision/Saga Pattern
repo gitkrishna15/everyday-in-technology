@@ -1,0 +1,246 @@
+Topic: Saga Pattern
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What the Saga Pattern Is
+The Saga Pattern is a way to manage distributed transactions by breaking them into a sequence of local transactions, where each step has a compensating action in case something fails.
+Instead of:
+	•	One big transaction
+	•	One global lock
+	•	One rollback
+You get:
+	•	Multiple independent steps
+	•	Each step commits immediately
+	•	Failures are handled by compensation
+In simple words:
+A Saga is a transaction without a global rollback, using compensating actions instead.
+
+Why Saga Exists
+Traditional transactions (ACID) work well inside one database.
+But in microservices:
+	•	Each service has its own database
+	•	Two-phase commit doesn’t scale
+	•	Network failures are common
+	•	Locking across services is impossible
+So instead of: ❌ “All or nothing” We use: ✅ “Do steps → if something fails → undo previous steps”
+
+What Breaks If We Don’t Use Saga
+Without Saga:
+	•	Partial orders get created
+	•	Money is deducted but order fails
+	•	Inventory gets locked forever
+	•	Data becomes inconsistent
+	•	Manual cleanup is required
+	•	Business loses trust
+Most distributed system failures are partial success failures, not full failures.
+
+2. Tradeoffs
+Consistency vs Availability
+Saga sacrifices strong consistency for availability.
+Simplicity vs Scalability
+Simple systems use transactions. Scalable systems need sagas.
+Reliability vs Complexity
+Saga improves reliability but adds:
+	•	Compensation logic
+	•	Event handling
+	•	Failure paths
+Speed vs Safety
+Sagas are fast but eventually consistent. ACID is slow but strongly consistent.
+
+3. Design Calmly
+When to Use Saga Pattern
+Use Saga when:
+	•	Multiple services are involved
+	•	Each service owns its data
+	•	Operations span multiple steps
+	•	You need high availability
+	•	Eventual consistency is acceptable
+Examples:
+	•	Order processing
+	•	Payment workflows
+	•	Booking systems
+	•	Provisioning systems
+
+When NOT to Use Saga
+Avoid Saga when:
+	•	Strong consistency is mandatory
+	•	All data is in one database
+	•	Transactions are short
+	•	Rollback is impossible or unsafe
+Examples:
+	•	Banking ledger core
+	•	Financial settlements
+	•	Accounting systems
+
+Assumptions That Must Be True
+	•	Each step is independently executable
+	•	Each step has a compensating action
+	•	Failures are expected
+	•	System tolerates temporary inconsistency
+	•	Messages can be retried
+If these assumptions don’t hold → Saga will fail.
+
+4. Think Like a System Owner
+Failure Scenario 1: Order Placement
+Steps:
+	1	Create Order
+	2	Reserve Inventory
+	3	Process Payment
+	4	Confirm Order
+Failure:
+	•	Payment fails after inventory reserved
+Compensation:
+	•	Release inventory
+	•	Mark order as failed
+Without Saga:
+	•	Inventory locked forever
+	•	Customer charged incorrectly
+	•	Manual cleanup needed
+
+Failure Scenario 2: Service Down Mid-Flow
+What happens:
+	•	Order created
+	•	Inventory reserved
+	•	Payment service down
+Saga behavior:
+	•	Retry payment
+	•	If timeout → compensate inventory
+	•	Order marked failed
+System stays consistent.
+
+Failure Scenario 3: Duplicate Events
+What happens:
+	•	Message retried
+	•	Same step executed twice
+Fix:
+	•	Idempotent operations
+	•	Event deduplication
+Saga relies heavily on idempotency.
+
+Cost and Risk Implications
+	•	More services → more compensation logic
+	•	More messages → higher latency
+	•	Debugging becomes harder
+	•	Monitoring becomes critical
+But:
+	•	System scales
+	•	No global locks
+	•	High availability
+
+5. Types of Saga Patterns
+
+1️⃣ Choreography-Based Saga
+How it works
+	•	Services communicate via events
+	•	No central coordinator
+	•	Each service reacts to events
+Example:
+	1	OrderCreated → Inventory Service
+	2	InventoryReserved → Payment Service
+	3	PaymentCompleted → Shipping Service
+
+Pros
+	•	Highly decoupled
+	•	Easy to scale
+	•	No single point of failure
+Cons
+	•	Hard to debug
+	•	Complex event flow
+	•	Hard to visualize
+	•	Risk of cyclic dependencies
+
+2️⃣ Orchestration-Based Saga
+How it works
+	•	Central orchestrator controls workflow
+	•	Calls each service
+	•	Handles success and failure
+Example:
+	•	Order Service → calls Inventory
+	•	If success → calls Payment
+	•	If failure → triggers compensation
+
+Pros
+	•	Easier to understand
+	•	Centralized logic
+	•	Easier debugging
+	•	Better visibility
+Cons
+	•	Orchestrator is critical component
+	•	Slightly tighter coupling
+
+6. Real World Applications
+Example 1: E-Commerce Order
+Steps:
+	1	Create order
+	2	Reserve stock
+	3	Charge payment
+	4	Arrange delivery
+Failure handling:
+	•	Payment fails → cancel order → release stock
+Pattern:
+	•	Saga (orchestrated)
+
+Example 2: Cloud Resource Provisioning
+Steps:
+	1	Create VM
+	2	Allocate storage
+	3	Assign network
+	4	Configure security
+Failure:
+	•	Storage fails → delete VM
+Pattern:
+	•	Saga with compensation
+
+Example 3: Travel Booking System
+Steps:
+	1	Book flight
+	2	Reserve hotel
+	3	Rent car
+Failure:
+	•	Hotel fails → cancel flight
+Classic Saga use case.
+
+7. Cloud Service Mapping
+AWS
+	•	Step Functions (Saga orchestration)
+	•	SNS / SQS (choreography)
+	•	Lambda for steps
+	•	DynamoDB for state
+Azure
+	•	Durable Functions
+	•	Service Bus
+	•	Logic Apps
+GCP
+	•	Workflows
+	•	Pub/Sub
+	•	Cloud Tasks
+
+8. Interview Perspective
+How to Explain Saga Simply
+Say:
+“Saga is a pattern for managing distributed transactions by breaking them into steps, each with a compensating action, instead of using a global transaction.”
+Then explain:
+	•	Why 2PC doesn’t scale
+	•	How compensation works
+	•	When to use choreography vs orchestration
+
+What Interviewers Look For
+	•	Understanding of distributed failures
+	•	Awareness of eventual consistency
+	•	Ability to design rollback logic
+	•	Experience with async workflows
+
+Common Mistakes
+	•	Using Saga where ACID is required
+	•	Forgetting compensation logic
+	•	Assuming retries solve everything
+	•	Not making steps idempotent
+	•	No monitoring or tracing
+
+Final Takeaway
+Saga Pattern is the foundation of reliable microservices.
+Great architects:
+	•	Accept eventual consistency
+	•	Design compensations carefully
+	•	Prefer orchestration for clarity
+	•	Make operations idempotent
+	•	Monitor and trace everything
