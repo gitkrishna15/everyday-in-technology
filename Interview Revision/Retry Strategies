@@ -1,0 +1,255 @@
+Topic: Retry Strategies
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What retry really means
+A retry is the act of attempting an operation again after a failure.
+Sounds simple — but in distributed systems, retries are one of the most dangerous mechanisms if misunderstood.
+Retries exist because:
+	•	Networks fail temporarily
+	•	Timeouts occur even when operations succeed
+	•	Services get overloaded
+	•	Transient errors are common
+Retries are not an optimization. They are a survival mechanism.
+
+Why retries exist in distributed systems
+In real systems:
+	•	Requests time out but still succeed
+	•	Packets are dropped
+	•	Services are temporarily overloaded
+	•	Dependencies restart
+If systems did not retry:
+	•	Minor network glitches would cause full failures
+	•	Availability would be extremely poor
+	•	User experience would be unstable
+But retries come with a cost.
+
+What breaks if we don’t understand retries
+If retries are implemented incorrectly:
+	•	Systems amplify failures instead of recovering
+	•	Traffic storms occur
+	•	Databases collapse under load
+	•	Cascading failures spread across services
+	•	Incidents become much worse than the original problem
+Many major outages (AWS, Azure, Netflix, etc.) were caused or worsened by bad retry logic.
+
+2. Tradeoffs
+Reliability vs Stability
+Retries increase success rate, but can destabilize systems under load.
+Simplicity vs Control
+Simple retries are easy to implement. Controlled retries require backoff, limits, and logic.
+Speed vs Safety
+Immediate retries feel fast but can overload systems. Delayed retries protect systems but increase latency.
+Availability vs Correctness
+Retrying non-idempotent operations causes duplication and corruption.
+
+3. Design Calmly
+When Retries Are Appropriate
+Retries make sense when:
+	•	Errors are transient
+	•	The operation is idempotent
+	•	The system can recover quickly
+	•	The failure is due to timeout or network glitch
+Examples:
+	•	HTTP 5xx
+	•	Connection timeouts
+	•	Temporary overload
+	•	Leader re-election
+
+When Retries Are Dangerous
+Retries should be avoided when:
+	•	The error is permanent
+	•	The operation is not idempotent
+	•	The downstream system is already overloaded
+	•	The retry causes duplicate side effects
+Examples:
+	•	Payment processing
+	•	Resource creation
+	•	Database writes without idempotency
+	•	Non-retriable errors (4xx)
+
+Assumptions That Must Be True
+Before adding retries:
+	•	Operation is idempotent
+	•	Error type is transient
+	•	Retry limit is defined
+	•	Backoff strategy exists
+	•	Circuit breakers are in place
+If any of these are missing, retries become dangerous.
+
+4. Think Like a System Owner
+Failure Scenario 1: Retry Storm
+What happens:
+	•	Downstream service slows
+	•	Clients retry immediately
+	•	Traffic multiplies
+	•	System collapses
+This is called a retry storm.
+Cause:
+	•	No backoff
+	•	No retry limit
+	•	No circuit breaker
+
+Failure Scenario 2: Duplicate Side Effects
+What happens:
+	•	Client times out
+	•	Retries request
+	•	Operation already succeeded
+	•	Duplicate transaction occurs
+Example:
+	•	Double payment
+	•	Duplicate order
+	•	Duplicate resource creation
+Cause:
+	•	No idempotency
+	•	Blind retries
+
+Failure Scenario 3: Thundering Herd
+What happens:
+	•	Service recovers
+	•	Thousands of clients retry simultaneously
+	•	System overloads again
+Cause:
+	•	Fixed retry intervals
+	•	No jitter
+
+Cost Explosion Risks
+	•	Increased API calls
+	•	Higher compute usage
+	•	Database overload
+	•	Increased network egress
+	•	More logs and metrics
+Retries directly increase cost.
+
+Security Risks
+	•	Retry storms resemble DDoS
+	•	Authentication systems get overloaded
+	•	Rate limiting bypassed unintentionally
+	•	Amplification of attacks
+
+Operational Challenges
+	•	Debugging retry loops
+	•	Identifying retry storms
+	•	Understanding failure root cause
+	•	Coordinating retries across services
+	•	Tuning retry parameters
+
+5. Retry Patterns (The Right Way)
+1. Fixed Retry (Bad Default)
+Retry after fixed interval.
+Problem:
+	•	Causes retry storms
+	•	No adaptation
+Use only for:
+	•	Very controlled internal systems
+
+2. Exponential Backoff (Recommended)
+Retry after increasing intervals:
+	•	1s → 2s → 4s → 8s
+Benefits:
+	•	Reduces pressure on failing service
+	•	Allows recovery time
+Used by:
+	•	AWS SDKs
+	•	Google APIs
+	•	Kubernetes
+
+3. Exponential Backoff with Jitter (Best Practice)
+Adds randomness:
+	•	Prevents synchronized retries
+	•	Avoids thundering herd
+This is the industry standard.
+
+4. Retry with Circuit Breaker
+If failures exceed threshold:
+	•	Stop retries
+	•	Fail fast
+	•	Retry after cooldown
+Prevents cascading failures.
+
+5. Retry with Dead Letter Queue
+For async systems:
+	•	Retry N times
+	•	Move to DLQ
+	•	Manual or automated handling
+Used in:
+	•	Kafka
+	•	SQS
+	•	Pub/Sub
+
+6. Real World Applications
+Example 1: Payment API
+Problem: Timeout occurs, client retries.
+Solution:
+	•	Use idempotency key
+	•	Retry only on network errors
+	•	Limit retries to 2–3
+Outcome:
+	•	No duplicate charges
+	•	High reliability
+
+Example 2: Microservices Call Chain
+Problem: Service A calls B, B calls C.
+Without retries:
+	•	Temporary failure breaks entire flow
+With naive retries:
+	•	Cascading failure
+Solution:
+	•	Retry + backoff
+	•	Circuit breaker
+	•	Timeout budgets
+
+Example 3: Message Processing System
+Problem: Consumer fails processing message.
+Solution:
+	•	Retry with backoff
+	•	Send to DLQ after N failures
+	•	Manual inspection
+Outcome:
+	•	No data loss
+	•	System remains stable
+
+7. Cloud Service Mapping
+AWS
+	•	SDK retries with exponential backoff
+	•	SQS retry + DLQ
+	•	Step Functions retry policies
+	•	API Gateway retry logic
+Azure
+	•	Service Bus retries
+	•	Durable Functions retry policies
+	•	Polly library for retries
+GCP
+	•	Pub/Sub retry handling
+	•	Cloud Tasks retries
+	•	Client-side exponential backoff
+
+8. Interview Perspective
+How to Explain Retry Strategies
+Say:
+“Retries help handle transient failures, but if not designed carefully they can amplify outages. The key is combining retries with backoff, idempotency, and circuit breakers.”
+Then explain:
+	•	When retries help
+	•	When retries hurt
+	•	How you control retries
+
+What Interviewers Look For
+	•	Understanding of failure modes
+	•	Awareness of retry storms
+	•	Knowledge of idempotency
+	•	Ability to design safe retry logic
+
+Common Mistakes
+	•	Retrying everything
+	•	No retry limit
+	•	No backoff
+	•	Retrying non-idempotent operations
+	•	Ignoring circuit breakers
+
+Final Takeaway
+Retries are powerful, but dangerous.
+Great architects:
+	•	Retry only when safe
+	•	Always use backoff
+	•	Combine retries with idempotency
+	•	Protect systems with circuit breakers
+	•	Treat retries as part of system design, not error handling
