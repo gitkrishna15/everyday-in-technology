@@ -1,0 +1,266 @@
+Topic: Consistency Models
+
+1. What is it? Why does it exist? What breaks if we don’t understand it?
+What consistency models are
+A consistency model defines the rules about when and how updates made by one part of a distributed system become visible to others.
+In simple words:
+It defines what different users are allowed to see, and when they see it.
+It answers questions like:
+	•	If I update data, will others see it immediately?
+	•	Can different users see different values?
+	•	Can I read my own writes?
+	•	Can stale data appear?
+
+Why consistency models exist
+Consistency models exist because:
+	•	Data is replicated across machines
+	•	Networks are slow and unreliable
+	•	Systems need to scale
+	•	Failures are inevitable
+You cannot have:
+	•	Perfect consistency
+	•	High availability
+	•	Global scale
+	•	Low latency
+at the same time.
+So systems define rules for what consistency they guarantee.
+
+What breaks if we don’t understand consistency models
+If teams don’t understand consistency:
+	•	Users see “incorrect” data
+	•	Bugs appear randomly
+	•	Race conditions occur
+	•	Data corruption happens
+	•	Systems behave differently under load
+	•	Debugging becomes nearly impossible
+Most production bugs in distributed systems are consistency misunderstandings, not code bugs.
+
+2. Tradeoffs
+Consistency vs Availability
+Stronger consistency → lower availability Weaker consistency → higher availability
+Consistency vs Performance
+Strong consistency requires coordination Coordination adds latency
+Simplicity vs Scalability
+Strong consistency is easier to reason about Weak consistency scales better
+Speed vs Correctness
+Fast systems often allow stale reads Correct systems accept slower responses
+
+3. Types of Consistency Models (Explained Clearly)
+
+1. Strong Consistency
+What it means
+Once a write completes:
+	•	All reads return the latest value
+	•	No stale data is ever visible
+Example
+Bank balance update:
+	•	You deposit money
+	•	Immediately see updated balance everywhere
+Characteristics
+	•	Simple to reason about
+	•	Predictable behavior
+	•	High coordination overhead
+	•	Higher latency
+Used When
+	•	Financial systems
+	•	Authentication
+	•	Inventory
+	•	Transactions
+Risk
+	•	Reduced availability
+	•	Slower performance
+	•	Hard to scale globally
+
+2. Eventual Consistency
+What it means
+After a write:
+	•	System may temporarily return old data
+	•	Eventually all replicas become consistent
+Example
+Social media likes:
+	•	You like a post
+	•	Friend sees it a few seconds later
+Characteristics
+	•	Highly scalable
+	•	Fast writes
+	•	High availability
+	•	Temporary inconsistency
+Used When
+	•	Feeds
+	•	Metrics
+	•	Analytics
+	•	Caching
+Risk
+	•	Stale reads
+	•	Confusing user experience
+	•	Complex reconciliation logic
+
+3. Read-Your-Writes Consistency
+What it means
+A user always sees their own updates, even if others don’t yet.
+Example
+You update your profile → you immediately see the change
+Used When
+	•	User-facing systems
+	•	Profile updates
+	•	Preferences
+
+4. Monotonic Reads
+What it means
+Once you’ve seen a value, you never see an older one.
+Example
+If you saw 10 notifications, you never see 9 later.
+Why it matters
+Prevents confusing user experiences.
+
+5. Monotonic Writes
+What it means
+Writes from a single client are applied in order.
+Example
+Update A → Update B System never applies B before A.
+Important for:
+	•	Logs
+	•	State transitions
+	•	Versioned data
+
+6. Causal Consistency
+What it means
+If one operation causally affects another, everyone sees them in that order.
+Example
+	•	Comment posted
+	•	Reply posted
+Everyone must see the comment before the reply.
+Stronger than eventual consistency
+Weaker than strong consistency
+
+7. Linearizability (Strict Consistency)
+What it means
+Operations appear to happen instantly and in real-time order.
+Characteristics
+	•	Strongest consistency
+	•	Very expensive
+	•	Rare at scale
+Used in:
+	•	Distributed locks
+	•	Leader election
+	•	Consensus systems
+
+4. Think Like a System Owner
+Failure Scenario 1: Stale Reads
+User updates profile → refreshes → sees old data
+Cause:
+	•	Eventual consistency
+	•	Read from replica
+Fix:
+	•	Read-your-writes
+	•	Sticky sessions
+	•	Read from leader
+
+Failure Scenario 2: Conflicting Updates
+Two users update same record
+Cause:
+	•	Weak consistency
+	•	No conflict resolution
+Fix:
+	•	Versioning
+	•	Optimistic locking
+	•	Conflict resolution logic
+
+Failure Scenario 3: Cross-Region Replication Lag
+Writes in Region A Reads in Region B return old data
+Cause:
+	•	Async replication
+Fix:
+	•	Accept lag
+	•	Or use stronger consistency at cost of latency
+
+Cost Explosion Risks
+	•	Strong consistency across regions
+	•	Synchronous replication
+	•	Excessive locking
+	•	High coordination overhead
+
+Operational Challenges
+	•	Debugging stale reads
+	•	Understanding replication lag
+	•	Handling conflicts
+	•	Explaining behavior to business teams
+	•	Designing retry logic
+
+5. Real World Applications
+Example 1: Banking System
+Consistency Model:
+	•	Strong consistency
+Reason:
+	•	Money must be correct
+	•	No stale reads allowed
+Tradeoff:
+	•	Slower transactions
+	•	Higher cost
+
+Example 2: Social Media Platform
+Consistency Model:
+	•	Eventual consistency
+Reason:
+	•	High scale
+	•	Performance more important than immediacy
+Tradeoff:
+	•	Temporary inconsistency accepted
+
+Example 3: E-commerce Platform
+Consistency Model:
+	•	Strong consistency for inventory
+	•	Eventual consistency for views & reviews
+Reason:
+	•	Hybrid model balances cost and correctness
+
+6. Cloud Service Mapping
+AWS
+	•	Strong:
+	◦	RDS
+	◦	Aurora
+	•	Eventual:
+	◦	DynamoDB
+	◦	S3
+	•	Tunable:
+	◦	DynamoDB (strong read option)
+Azure
+	•	Strong:
+	◦	Azure SQL
+	•	Tunable:
+	◦	Cosmos DB (multiple consistency levels)
+GCP
+	•	Strong:
+	◦	Cloud Spanner
+	•	Eventual:
+	◦	Bigtable
+	◦	Firestore
+
+7. Interview Perspective
+How to Explain Consistency Models
+Say:
+“Consistency models define what data users see and when. Strong consistency prioritizes correctness, while weaker models improve availability and scalability.”
+Then explain:
+	•	Which model your system uses
+	•	Why that model was chosen
+	•	What tradeoffs you accepted
+
+What Interviewers Look For
+	•	Clear understanding of tradeoffs
+	•	Awareness of real-world failure scenarios
+	•	Ability to map consistency to business needs
+	•	Practical system design thinking
+
+Common Mistakes
+	•	Assuming strong consistency is always best
+	•	Ignoring replication delays
+	•	Not designing for stale data
+	•	Mixing models without understanding impact
+
+Final Takeaway
+Consistency models define how reality behaves in a distributed system.
+Great architects:
+	•	Choose consistency deliberately
+	•	Understand user impact
+	•	Accept tradeoffs consciously
+	•	Design for failure, not perfection
