@@ -1,0 +1,207 @@
+Topic: Quorum
+
+1. What is Quorum? Why does it exist? What breaks if we don’t understand it?
+What Quorum Means
+A quorum is the minimum number of nodes that must agree before a distributed system considers an operation successful.
+In simple terms:
+Quorum = majority agreement
+If you have:
+	•	3 nodes → quorum = 2
+	•	5 nodes → quorum = 3
+	•	7 nodes → quorum = 4
+This rule ensures:
+	•	No split-brain
+	•	No conflicting decisions
+	•	No data corruption
+
+Why Quorum Exists
+Distributed systems face these realities:
+	•	Nodes fail
+	•	Networks partition
+	•	Messages are delayed
+	•	Machines crash silently
+If every node could act independently:
+	•	Two nodes might both think they are leader
+	•	Writes could diverge
+	•	Data corruption would occur
+Quorum ensures:
+	•	Only one version of truth
+	•	Majority agreement before action
+	•	Safety over speed
+
+What Breaks If You Don’t Understand Quorum
+If quorum is misunderstood or ignored:
+	•	Split-brain occurs
+	•	Multiple leaders exist
+	•	Data corruption happens
+	•	Writes conflict
+	•	Recovery becomes nearly impossible
+Most serious distributed outages are caused by incorrect quorum handling, not hardware failure.
+
+2. Tradeoffs
+Consistency vs Availability
+Quorum favors consistency. If quorum is not reached → system becomes unavailable.
+Performance vs Safety
+Waiting for quorum increases latency. Skipping quorum increases risk.
+Simplicity vs Reliability
+Single-node systems are simple. Quorum-based systems are reliable but complex.
+Cost vs Resilience
+More nodes = stronger fault tolerance More nodes = higher cost
+
+3. Design Calmly
+When Quorum Is Required
+You must use quorum when:
+	•	You need strong consistency
+	•	Writes must not conflict
+	•	Leadership must be unique
+	•	Data must never diverge
+Examples:
+	•	Distributed databases
+	•	Leader election
+	•	Metadata storage
+	•	Configuration management
+	•	Distributed locks
+
+When Quorum Is NOT Required
+Quorum is not needed when:
+	•	System is read-heavy
+	•	Eventual consistency is acceptable
+	•	Data loss is tolerable
+	•	Operations are idempotent
+Examples:
+	•	Logs
+	•	Metrics
+	•	Caching
+	•	Analytics pipelines
+
+Assumptions That Must Be True
+For quorum to work:
+	•	Nodes must agree on membership
+	•	Majority must be reachable
+	•	Network partitions are expected
+	•	Failures are detected accurately
+If these assumptions fail, quorum fails.
+
+4. Think Like a System Owner
+Failure Scenario 1: Split-Brain
+Cluster of 5 nodes splits into:
+	•	3 nodes in one partition
+	•	2 nodes in another
+What happens:
+	•	Majority side (3) continues
+	•	Minority side (2) stops accepting writes
+This prevents:
+	•	Two leaders
+	•	Conflicting writes
+	•	Data corruption
+
+Failure Scenario 2: Loss of Majority
+Cluster of 3 nodes:
+	•	2 nodes go down
+Result:
+	•	No quorum
+	•	System becomes read-only or unavailable
+This is intentional.
+Why? Because wrong data is worse than no data.
+
+Failure Scenario 3: Latency Spike
+One node is slow.
+If quorum is:
+	•	Majority-based → system continues
+	•	All-nodes-required → system stalls
+Quorum allows systems to tolerate slow or failed nodes.
+
+Cost and Risk Implications
+	•	More nodes → higher infrastructure cost
+	•	More nodes → better fault tolerance
+	•	Quorum writes → higher latency
+	•	Fewer nodes → lower resilience
+
+Operational Challenges
+	•	Monitoring quorum health
+	•	Handling node flapping
+	•	Avoiding split-brain
+	•	Ensuring odd number of nodes
+	•	Handling degraded mode
+
+5. Quorum in Practice (Very Important)
+Read Quorum (R)
+Number of nodes that must respond to a read.
+Write Quorum (W)
+Number of nodes that must acknowledge a write.
+Replication Factor (N)
+Total number of replicas.
+To guarantee consistency:
+
+R + W > N
+This ensures:
+	•	Read always sees latest write
+
+Example
+N = 3 W = 2 R = 2
+Then:
+	•	Write must go to 2 nodes
+	•	Read must read from 2 nodes
+	•	At least one overlap guaranteed
+This is how DynamoDB, Cassandra, etc. work.
+
+6. Real World Applications
+Example 1: Kubernetes (etcd)
+	•	etcd uses Raft
+	•	Requires majority to commit changes
+	•	If quorum lost → cluster becomes read-only
+	•	Prevents split-brain
+
+Example 2: Distributed Databases
+Cassandra / DynamoDB:
+	•	Tunable quorum
+	•	Tradeoff between consistency & latency
+	•	Allows flexible CAP behavior
+
+Example 3: Leader Election
+Leader elected only if:
+	•	Majority votes
+	•	Prevents two leaders
+	•	Guarantees consistency
+
+7. Cloud Service Mapping
+AWS
+	•	DynamoDB quorum writes
+	•	EKS etcd quorum
+	•	Aurora quorum replication
+Azure
+	•	Cosmos DB quorum
+	•	Service Fabric
+GCP
+	•	Spanner (Paxos quorum)
+	•	Kubernetes etcd
+
+8. Interview Perspective
+How to Explain Quorum Simply
+Say:
+“Quorum ensures that a majority of nodes agree before a decision is accepted. It prevents split-brain and guarantees consistency even when some nodes fail.”
+Then explain:
+	•	Why majority matters
+	•	What happens when quorum is lost
+	•	How it affects availability
+
+What Interviewers Look For
+	•	Understanding of split-brain
+	•	Awareness of quorum math
+	•	Knowledge of R/W quorum
+	•	Practical system design thinking
+
+Common Mistakes
+	•	Using even number of nodes
+	•	Ignoring quorum loss
+	•	Assuming quorum = availability
+	•	Not understanding read/write quorum
+	•	Designing systems that require all nodes
+
+Final Takeaway
+Quorum is the foundation of safe distributed systems.
+Great architects:
+	•	Design around quorum
+	•	Accept temporary unavailability
+	•	Avoid split-brain at all costs
+	•	Choose correctness over convenience
